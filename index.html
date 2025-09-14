@@ -100,6 +100,33 @@
     </form>
   </div>
 
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
+
+<script>
+  // Tu configuración real de Firebase (corrigiendo storageBucket)
+  const firebaseConfig = {
+    apiKey: "AIzaSyAWXt_ALsNJ25o9gwqa0NjVzQhXE4HQE60",
+    authDomain: "portafolio-993a6.firebaseapp.com",
+    projectId: "portafolio-993a6",
+    storageBucket: "portafolio-993a6.appspot.com",
+    messagingSenderId: "743033903125",
+    appId: "1:743033903125:web:d8c1a7144a290db4bc161c",
+    measurementId: "G-4R029XTYLN"
+  };
+
+  // Inicializa Firebase
+  const app = firebase.initializeApp(firebaseConfig);
+  const storage = firebase.storage();
+  const db = firebase.firestore();
+</script>
+
+
+
+
   
   <script src="script.js"></script>
 </body>
