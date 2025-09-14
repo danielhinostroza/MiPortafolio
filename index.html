@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Portafolio de Ingeniería de Sistemas</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <header>
+    <div class="logo">🎓 Mi Portafolio</div>
+    <nav>
+      <ul>
+        <li><a href="#about">Sobre mí</a></li>
+        <li><a href="#cursos">Cursos</a></li>
+        <li><a href="#proyectos">Proyectos</a></li>
+        <li><button id="adminBtn">Administrador</button></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Sección presentación -->
+    <section id="about" class="about">
+      <img src="imagenes/WhatsApp Image 2025-09-14 at 10.53.54 AM.jpeg" alt="Foto personal" class="profile-pic"/>
+      <h1>Hola, soy Ingeniero de Sistemas</h1>
+      <p>
+        Me especializo en desarrollo de software, diseño de sistemas y soluciones tecnológicas.
+        Aquí comparto mis proyectos y trabajos organizados por curso.
+      </p>
+    </section>
+
+    <!-- Cursos -->
+    <section id="cursos" class="cursos-section">
+      <h2>Categorías de Cursos</h2>
+      <div class="cursos-grid">
+        <div class="curso-card" data-curso="programacion">💻 Programación</div>
+        <div class="curso-card" data-curso="software">🛠️ Diseño de Software</div>
+        <div class="curso-card" data-curso="investigacion">📑 Investigación</div>
+        <div class="curso-card" data-curso="grafico">🎨 Diseño Gráfico</div>
+        <div class="curso-card" data-curso="redes">🌐 Redes</div>
+        <div class="curso-card" data-curso="bases">🗄️ Bases de Datos</div>
+        <div class="curso-card" data-curso="ia">🤖 Inteligencia Artificial</div>
+        <div class="curso-card" data-curso="seguridad">🔐 Seguridad Informática</div>
+      </div>
+    </section>
+
+    <!-- Proyectos -->
+   <section id="proyectos" class="proyectos-section">
+  <h2>Trabajos del Curso Seleccionado</h2>
+
+  <!-- Filtros por tiempo -->
+  <div class="filtros">
+    <label for="filtroTiempo">Filtrar por tiempo:</label>
+    <select id="filtroTiempo">
+      <option value="todos">Todos</option>
+      <option value="hoy">Hoy</option>
+      <option value="semana">Esta semana</option>
+      <option value="mes">Este mes</option>
+    </select>
+  </div>
+
+  <div id="trabajosList" class="trabajos-list"></div>
+</section>
+
+
+  <!-- Modal Login -->
+  <div id="loginModal" class="modal">
+    <div class="modal-content">
+      <span class="closeBtn">&times;</span>
+      <h2>Acceso Administrador</h2>
+      <form id="loginForm">
+        <label for="email">Usuario</label>
+        <input type="email" id="email" placeholder="admin@portafolio.com" required>
+        <label for="password">Contraseña</label>
+        <input type="password" id="password" placeholder="1234" required>
+        <button type="submit" class="btn-login">Entrar</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Panel Admin (oculto por defecto) -->
+  <div id="adminPanel" class="admin-panel hidden">
+    <h2>Panel de Administración</h2>
+    <button id="logoutBtn" class="btn-logout">Cerrar Sesión</button>
+    <form id="uploadForm">
+      <input type="text" id="titulo" placeholder="Título del trabajo" required>
+      <select id="cursoSelect">
+        <option value="programacion">Programación</option>
+        <option value="software">Diseño de Software</option>
+        <option value="investigacion">Investigación</option>
+        <option value="grafico">Diseño Gráfico</option>
+        <option value="redes">Redes</option>
+        <option value="bases">Bases de Datos</option>
+        <option value="ia">Inteligencia Artificial</option>
+        <option value="seguridad">Seguridad Informática</option>
+      </select>
+      <input type="file" id="archivo" required>
+      <button type="submit">Subir Trabajo</button>
+    </form>
+  </div>
+
+  
+  <script src="script.js"></script>
+</body>
+</html>

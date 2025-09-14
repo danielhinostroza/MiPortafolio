@@ -1,0 +1,174 @@
+/* Fondo con degradado */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: url("imagenes/63f47a569b0448ab8d4da54b8804ad41.webp") no-repeat center center fixed;
+  background-size: cover;
+  color: #fff; /* Para que el texto contraste con el fondo */
+}
+
+
+/* Header */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(0,0,0,0.7);
+  padding: 15px 40px;
+}
+header .logo {
+  font-size: 22px;
+  font-weight: bold;
+}
+header nav ul {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+}
+header nav ul li a,
+header nav ul li button {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 15px;
+  cursor: pointer;
+}
+header nav ul li button {
+  background: #830af5;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: bold;
+}
+
+/* About */
+.about {
+  text-align: center;
+  padding: 60px 20px;
+}
+.profile-pic {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  border: 4px solid #8e06dd;
+  object-fit: cover;
+  margin-bottom: 20px;
+}
+
+
+/* Cursos */
+.cursos-section {
+  padding: 50px 20px;
+}
+.cursos-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 25px;
+  margin-top: 30px;
+}
+.curso-card {
+  background: rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 40px 20px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  border: 2px solid #8309e7;
+  transition: transform 0.3s, background 0.3s;
+}
+.curso-card:hover {
+  transform: translateY(-8px);
+  background: rgba(255,255,255,0.2);
+}
+
+/* Proyectos */
+.proyectos-section {
+  padding: 40px 20px;
+}
+.trabajos-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-top: 20px;
+}
+.trabajo-card {
+  background: rgba(255,255,255,0.15);
+  padding: 20px;
+  border-radius: 10px;
+}
+.trabajo-card h3 {
+  margin-top: 0;
+}
+.trabajo-card a {
+  color: #ffb400;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+/* Modal Login */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 10;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.7);
+}
+.modal-content {
+  background: #fff;
+  color: #000;
+  margin: 10% auto;
+  padding: 30px;
+  border-radius: 12px;
+  width: 350px;
+  text-align: center;
+}
+.modal-content h2 {
+  margin-bottom: 20px;
+}
+.modal-content label {
+  display: block;
+  margin: 10px 0 5px;
+  font-weight: bold;
+}
+.modal-content input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 15px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+.btn-login {
+  background: #1e3c72;
+  color: #fff;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.closeBtn {
+  float: right;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+/* Admin panel */
+.admin-panel {
+  background: rgba(0,0,0,0.8);
+  padding: 20px;
+  margin: 20px;
+  border-radius: 12px;
+}
+.btn-logout {
+  background: #e63946;
+  color: #fff;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  cursor: pointer;
+}
+.hidden {
+  display: none;
+}
