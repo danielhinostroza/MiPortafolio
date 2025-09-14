@@ -12,7 +12,14 @@ let esAdmin = false;
 
 adminBtn.onclick = () => loginModal.style.display = "block";
 closeBtn.onclick = () => loginModal.style.display = "none";
-window.onclick = (e) => { if (e.target === loginModal) loginModal.style.display = "none"; };
+
+// ======================================
+// Combinamos todos los window.onclick
+// ======================================
+window.onclick = (e) => {
+  if (e.target === loginModal) loginModal.style.display = "none";
+  if (e.target === verModal) verModal.style.display = "none";
+};
 
 loginForm.addEventListener("submit", (e) => {
   e.preventDefault();
@@ -40,7 +47,6 @@ logoutBtn.addEventListener("click", () => {
 // ==========================
 // FIREBASE CONFIG
 // ==========================
-// Ya declaraste firebaseConfig en tu HTML
 const appFirebase = firebase.initializeApp(firebaseConfig);
 const storage = firebase.storage();
 const db = firebase.firestore();
@@ -73,7 +79,6 @@ document.body.appendChild(verModal);
 const archivoVista = document.getElementById("archivoVista");
 const cerrarVerModal = document.getElementById("cerrarVerModal");
 cerrarVerModal.onclick = () => verModal.style.display = "none";
-window.onclick = (e) => { if (e.target === verModal) verModal.style.display = "none"; };
 
 // ==========================
 // MOSTRAR TRABAJOS DESDE FIRESTORE
