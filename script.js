@@ -20,13 +20,6 @@ closeBtn.addEventListener("click", () => {
   loginModal.style.display = "none";
 });
 
-// Cerrar modal al hacer click fuera del contenido
-window.addEventListener("click", (e) => {
-  if (e.target === loginModal) {
-    loginModal.style.display = "none";
-  }
-});
-
 // Login admin
 loginForm.addEventListener("submit", (e) => {
   e.preventDefault();
@@ -55,8 +48,6 @@ logoutBtn.addEventListener("click", () => {
 // ==========================
 // FIREBASE CONFIG
 // ==========================
-// Asegúrate de tener firebaseConfig en tu HTML antes de este script
-const appFirebase = firebase.initializeApp(firebaseConfig);
 const storage = firebase.storage();
 const db = firebase.firestore();
 
@@ -87,8 +78,15 @@ document.body.appendChild(verModal);
 
 const archivoVista = document.getElementById("archivoVista");
 const cerrarVerModal = document.getElementById("cerrarVerModal");
+
+// Cerrar modal de ver archivos
 cerrarVerModal.onclick = () => verModal.style.display = "none";
-window.onclick = (e) => { if (e.target === verModal) verModal.style.display = "none"; };
+
+// Cerrar modales haciendo click fuera
+window.addEventListener("click", (e) => {
+  if (e.target === verModal) verModal.style.display = "none";
+  if (e.target === loginModal) loginModal.style.display = "none";
+});
 
 // ==========================
 // MOSTRAR TRABAJOS DESDE FIRESTORE
