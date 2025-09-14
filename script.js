@@ -39,6 +39,30 @@ const uploadForm = document.getElementById("uploadForm");
 const trabajosList = document.getElementById("trabajosList");
 let trabajos = JSON.parse(localStorage.getItem("trabajos")) || [];
 
+// Modal para ver archivo
+const verModal = document.createElement("div");
+verModal.id = "verModal";
+verModal.style.display = "none";
+verModal.style.position = "fixed";
+verModal.style.top = "0";
+verModal.style.left = "0";
+verModal.style.width = "100%";
+verModal.style.height = "100%";
+verModal.style.backgroundColor = "rgba(0,0,0,0.7)";
+verModal.style.zIndex = "9999";
+verModal.innerHTML = `
+  <div style="position:relative; margin:50px auto; background:#fff; padding:10px; width:80%; height:80%;">
+    <span id="cerrarVerModal" style="position:absolute; top:10px; right:20px; font-size:24px; cursor:pointer;">&times;</span>
+    <embed id="archivoVista" src="" type="application/pdf" width="100%" height="100%" />
+  </div>
+`;
+document.body.appendChild(verModal);
+
+const archivoVista = document.getElementById("archivoVista");
+const cerrarVerModal = document.getElementById("cerrarVerModal");
+cerrarVerModal.onclick = () => verModal.style.display = "none";
+window.onclick = (e) => { if (e.target === verModal) verModal.style.display = "none"; };
+
 function mostrarTrabajos(filtroCurso = null) {
   trabajosList.innerHTML = "";
   trabajos
@@ -51,7 +75,8 @@ function mostrarTrabajos(filtroCurso = null) {
         <p><strong>Curso:</strong> ${t.curso}</p>
         <p><strong>Fecha:</strong> ${t.fecha}</p>
         <embed src="${t.archivo}" width="100%" height="150px" type="application/pdf"/>
-        <a href="${t.archivo}" download="${t.titulo}">Descargar</a>
+        <a href="${t.archivo}" download>Descargar</a>
+        <button class="verBtn" data-archivo="${t.archivo}">Ver</button>
         ${esAdmin ? `<button class="deleteBtn" data-index="${index}">Eliminar</button>` : ""}
       `;
       trabajosList.appendChild(card);
@@ -68,6 +93,15 @@ function mostrarTrabajos(filtroCurso = null) {
       });
     });
   }
+
+  // Activar botón ver (para todos los usuarios)
+  document.querySelectorAll(".verBtn").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      const archivo = e.target.dataset.archivo;
+      archivoVista.src = archivo;
+      verModal.style.display = "block";
+    });
+  });
 }
 
 uploadForm.addEventListener("submit", (e) => {
@@ -77,24 +111,17 @@ uploadForm.addEventListener("submit", (e) => {
   const archivoInput = document.getElementById("archivo");
 
   if (archivoInput.files.length > 0) {
-    const archivo = archivoInput.files[0];
-    const reader = new FileReader();
-
-    reader.onload = function(e) {
-      const archivoBase64 = e.target.result; // archivo convertido a Base64
-      const nuevoTrabajo = {
-        titulo,
-        curso,
-        archivo: archivoBase64, // guardamos el archivo en base64
-        fecha: new Date().toLocaleDateString()
-      };
-      trabajos.push(nuevoTrabajo);
-      localStorage.setItem("trabajos", JSON.stringify(trabajos));
-      mostrarTrabajos(curso);
-      uploadForm.reset();
+    const archivoURL = URL.createObjectURL(archivoInput.files[0]);
+    const nuevoTrabajo = {
+      titulo,
+      curso,
+      archivo: archivoURL,
+      fecha: new Date().toLocaleDateString()
     };
-
-    reader.readAsDataURL(archivo); // convierte el archivo a base64
+    trabajos.push(nuevoTrabajo);
+    localStorage.setItem("trabajos", JSON.stringify(trabajos));
+    mostrarTrabajos(curso);
+    uploadForm.reset();
   }
 });
 
