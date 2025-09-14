@@ -10,17 +10,24 @@ const logoutBtn = document.getElementById("logoutBtn");
 
 let esAdmin = false;
 
-adminBtn.onclick = () => loginModal.style.display = "block";
-closeBtn.onclick = () => loginModal.style.display = "none";
+// Abrir modal login
+adminBtn.addEventListener("click", () => {
+  loginModal.style.display = "block";
+});
 
-// ======================================
-// Combinamos todos los window.onclick
-// ======================================
-window.onclick = (e) => {
-  if (e.target === loginModal) loginModal.style.display = "none";
-  if (e.target === verModal) verModal.style.display = "none";
-};
+// Cerrar modal al hacer click en la X
+closeBtn.addEventListener("click", () => {
+  loginModal.style.display = "none";
+});
 
+// Cerrar modal al hacer click fuera del contenido
+window.addEventListener("click", (e) => {
+  if (e.target === loginModal) {
+    loginModal.style.display = "none";
+  }
+});
+
+// Login admin
 loginForm.addEventListener("submit", (e) => {
   e.preventDefault();
   const email = document.getElementById("email").value;
@@ -31,22 +38,24 @@ loginForm.addEventListener("submit", (e) => {
     loginModal.style.display = "none";
     adminPanel.classList.remove("hidden");
     esAdmin = true;
-    mostrarTrabajos(); 
+    mostrarTrabajos();
   } else {
     alert("Credenciales incorrectas");
   }
 });
 
+// Logout admin
 logoutBtn.addEventListener("click", () => {
   adminPanel.classList.add("hidden");
   alert("Sesión cerrada");
   esAdmin = false;
-  mostrarTrabajos(); 
+  mostrarTrabajos();
 });
 
 // ==========================
 // FIREBASE CONFIG
 // ==========================
+// Asegúrate de tener firebaseConfig en tu HTML antes de este script
 const appFirebase = firebase.initializeApp(firebaseConfig);
 const storage = firebase.storage();
 const db = firebase.firestore();
@@ -79,6 +88,7 @@ document.body.appendChild(verModal);
 const archivoVista = document.getElementById("archivoVista");
 const cerrarVerModal = document.getElementById("cerrarVerModal");
 cerrarVerModal.onclick = () => verModal.style.display = "none";
+window.onclick = (e) => { if (e.target === verModal) verModal.style.display = "none"; };
 
 // ==========================
 // MOSTRAR TRABAJOS DESDE FIRESTORE
@@ -87,9 +97,7 @@ async function mostrarTrabajos(filtroCurso = null) {
   trabajosList.innerHTML = "";
 
   let query = db.collection("trabajos");
-  if (filtroCurso) {
-    query = query.where("curso", "==", filtroCurso);
-  }
+  if (filtroCurso) query = query.where("curso", "==", filtroCurso);
 
   const snapshot = await query.orderBy("fecha", "desc").get();
 
@@ -111,7 +119,7 @@ async function mostrarTrabajos(filtroCurso = null) {
     trabajosList.appendChild(card);
   });
 
-  // Botón eliminar
+  // Botón eliminar solo para admin
   if (esAdmin) {
     document.querySelectorAll(".deleteBtn").forEach(btn => {
       btn.addEventListener("click", async (e) => {
@@ -124,7 +132,7 @@ async function mostrarTrabajos(filtroCurso = null) {
     });
   }
 
-  // Botón ver
+  // Botón ver archivo
   document.querySelectorAll(".verBtn").forEach(btn => {
     btn.addEventListener("click", (e) => {
       const archivo = e.target.dataset.archivo;
@@ -150,7 +158,7 @@ uploadForm.addEventListener("submit", async (e) => {
     // Subir archivo
     await storageRef.put(archivo);
 
-    // Obtener enlace de descarga
+    // Obtener URL de descarga
     const archivoURL = await storageRef.getDownloadURL();
 
     // Guardar en Firestore
