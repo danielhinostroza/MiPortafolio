@@ -38,6 +38,14 @@ logoutBtn.addEventListener("click", () => {
 });
 
 // ==========================
+// FIREBASE CONFIG
+// ==========================
+// Ya declaraste firebaseConfig en tu HTML
+const appFirebase = firebase.initializeApp(firebaseConfig);
+const storage = firebase.storage();
+const db = firebase.firestore();
+
+// ==========================
 // ELEMENTOS
 // ==========================
 const uploadForm = document.getElementById("uploadForm");
@@ -68,42 +76,45 @@ cerrarVerModal.onclick = () => verModal.style.display = "none";
 window.onclick = (e) => { if (e.target === verModal) verModal.style.display = "none"; };
 
 // ==========================
-// TRABAJOS LOCALSTORAGE
+// MOSTRAR TRABAJOS DESDE FIRESTORE
 // ==========================
-let trabajos = JSON.parse(localStorage.getItem("trabajos")) || [];
-
-function mostrarTrabajos(filtroCurso = null) {
+async function mostrarTrabajos(filtroCurso = null) {
   trabajosList.innerHTML = "";
 
-  trabajos
-    .filter(t => !filtroCurso || t.curso === filtroCurso)
-    .forEach((t, index) => {
-      const card = document.createElement("div");
-      card.classList.add("trabajo-card");
+  let query = db.collection("trabajos");
+  if (filtroCurso) {
+    query = query.where("curso", "==", filtroCurso);
+  }
 
-      // Convertir nombre de archivo a URL correcta (codificando espacios y tildes)
-      const archivoURL = `archivos/${encodeURIComponent(t.archivo)}`;
+  const snapshot = await query.orderBy("fecha", "desc").get();
 
-      card.innerHTML = `
-        <h3>${t.titulo}</h3>
-        <p><strong>Curso:</strong> ${t.curso}</p>
-        <p><strong>Fecha:</strong> ${t.fecha}</p>
-        <embed src="${archivoURL}" width="100%" height="150px" type="application/pdf"/>
-        <a href="${archivoURL}" target="_blank" download>Descargar</a>
-        <button class="verBtn" data-archivo="${archivoURL}">Ver</button>
-        ${esAdmin ? `<button class="deleteBtn" data-index="${index}">Eliminar</button>` : ""}
-      `;
-      trabajosList.appendChild(card);
-    });
+  snapshot.forEach((doc) => {
+    const t = doc.data();
+    const id = doc.id;
+
+    const card = document.createElement("div");
+    card.classList.add("trabajo-card");
+    card.innerHTML = `
+      <h3>${t.titulo}</h3>
+      <p><strong>Curso:</strong> ${t.curso}</p>
+      <p><strong>Fecha:</strong> ${t.fecha}</p>
+      <embed src="${t.archivo}" width="100%" height="150px" type="application/pdf"/>
+      <a href="${t.archivo}" target="_blank" download>Descargar</a>
+      <button class="verBtn" data-archivo="${t.archivo}">Ver</button>
+      ${esAdmin ? `<button class="deleteBtn" data-id="${id}">Eliminar</button>` : ""}
+    `;
+    trabajosList.appendChild(card);
+  });
 
   // Botón eliminar
   if (esAdmin) {
     document.querySelectorAll(".deleteBtn").forEach(btn => {
-      btn.addEventListener("click", (e) => {
-        const idx = e.target.dataset.index;
-        trabajos.splice(idx, 1);
-        localStorage.setItem("trabajos", JSON.stringify(trabajos));
-        mostrarTrabajos(filtroCurso);
+      btn.addEventListener("click", async (e) => {
+        const id = e.target.dataset.id;
+        if (confirm("¿Seguro que quieres eliminar este trabajo?")) {
+          await db.collection("trabajos").doc(id).delete();
+          mostrarTrabajos(filtroCurso);
+        }
       });
     });
   }
@@ -119,9 +130,9 @@ function mostrarTrabajos(filtroCurso = null) {
 }
 
 // ==========================
-// SUBIR TRABAJOS
+// SUBIR TRABAJOS A FIREBASE
 // ==========================
-uploadForm.addEventListener("submit", (e) => {
+uploadForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const titulo = document.getElementById("titulo").value;
   const curso = document.getElementById("cursoSelect").value;
@@ -129,17 +140,23 @@ uploadForm.addEventListener("submit", (e) => {
 
   if (archivoInput.files.length > 0) {
     const archivo = archivoInput.files[0];
+    const storageRef = storage.ref().child(`trabajos/${Date.now()}_${archivo.name}`);
 
-    // Guardar solo el nombre del archivo, ya que está en /archivos/
-    const nuevoTrabajo = {
+    // Subir archivo
+    await storageRef.put(archivo);
+
+    // Obtener enlace de descarga
+    const archivoURL = await storageRef.getDownloadURL();
+
+    // Guardar en Firestore
+    await db.collection("trabajos").add({
       titulo,
       curso,
-      archivo: archivo.name,
+      archivo: archivoURL,
       fecha: new Date().toLocaleDateString()
-    };
+    });
 
-    trabajos.push(nuevoTrabajo);
-    localStorage.setItem("trabajos", JSON.stringify(trabajos));
+    alert("Trabajo subido correctamente ✅");
     mostrarTrabajos(curso);
     uploadForm.reset();
   }
@@ -159,4 +176,3 @@ document.querySelectorAll(".curso-card").forEach(card => {
 // MOSTRAR TODOS AL INICIO
 // ==========================
 mostrarTrabajos();
-git 
