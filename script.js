@@ -159,3 +159,4 @@ document.querySelectorAll(".curso-card").forEach(card => {
 // MOSTRAR TODOS AL INICIO
 // ==========================
 mostrarTrabajos();
+git 
