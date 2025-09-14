@@ -125,6 +125,44 @@
 </script>
 
 
+<!-- Nuevo botón Administrador -->
+<button id="nuevoAdminBtn">Administrador</button>
+
+<!-- Modal Login -->
+<div id="nuevoLoginModal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <span id="nuevoCloseBtn" class="closeBtn">&times;</span>
+    <h2>Acceso Administrador</h2>
+    <form id="nuevoLoginForm">
+      <label for="nuevoEmail">Usuario</label>
+      <input type="email" id="nuevoEmail" placeholder="admin@portafolio.com" required>
+      <label for="nuevoPassword">Contraseña</label>
+      <input type="password" id="nuevoPassword" placeholder="1234" required>
+      <button type="submit" class="btn-login">Entrar</button>
+    </form>
+  </div>
+</div>
+
+<!-- Panel Admin (oculto por defecto) -->
+<div id="nuevoAdminPanel" class="admin-panel hidden">
+  <h2>Panel de Administración</h2>
+  <button id="nuevoLogoutBtn" class="btn-logout">Cerrar Sesión</button>
+  <form id="nuevoUploadForm">
+    <input type="text" id="nuevoTitulo" placeholder="Título del trabajo" required>
+    <select id="nuevoCursoSelect">
+      <option value="programacion">Programación</option>
+      <option value="software">Diseño de Software</option>
+      <option value="investigacion">Investigación</option>
+      <option value="grafico">Diseño Gráfico</option>
+      <option value="redes">Redes</option>
+      <option value="bases">Bases de Datos</option>
+      <option value="ia">Inteligencia Artificial</option>
+      <option value="seguridad">Seguridad Informática</option>
+    </select>
+    <input type="file" id="nuevoArchivo" required>
+    <button type="submit">Subir Trabajo</button>
+  </form>
+</div>
 
 
   

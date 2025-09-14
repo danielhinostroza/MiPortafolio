@@ -1,6 +1,4 @@
-// ==========================
-// LOGIN ADMIN
-// ==========================
+// Modal login
 const adminBtn = document.getElementById("adminBtn");
 const loginModal = document.getElementById("loginModal");
 const closeBtn = document.querySelector(".closeBtn");
@@ -8,142 +6,71 @@ const loginForm = document.getElementById("loginForm");
 const adminPanel = document.getElementById("adminPanel");
 const logoutBtn = document.getElementById("logoutBtn");
 
-let esAdmin = false;
+let esAdmin = false; // <<-- Nueva variable de control
 
-// Abrir modal login
-adminBtn.addEventListener("click", () => {
-  loginModal.style.display = "block";
-});
+adminBtn.onclick = () => loginModal.style.display = "block";
+closeBtn.onclick = () => loginModal.style.display = "none";
+window.onclick = (e) => { if (e.target === loginModal) loginModal.style.display = "none"; };
 
-// Cerrar modal al hacer click en la X
-closeBtn.addEventListener("click", () => {
-  loginModal.style.display = "none";
-});
-
-// Login admin
 loginForm.addEventListener("submit", (e) => {
   e.preventDefault();
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
-
   if (email === "admin@portafolio.com" && password === "1234") {
     alert("Bienvenido Administrador");
     loginModal.style.display = "none";
     adminPanel.classList.remove("hidden");
-    esAdmin = true;
-    mostrarTrabajos();
+    esAdmin = true; // <<-- habilita el modo admin
+    mostrarTrabajos(); // refrescar con botón eliminar visible
   } else {
     alert("Credenciales incorrectas");
   }
 });
 
-// Logout admin
 logoutBtn.addEventListener("click", () => {
   adminPanel.classList.add("hidden");
   alert("Sesión cerrada");
-  esAdmin = false;
-  mostrarTrabajos();
+  esAdmin = false; // <<-- se desactiva el modo admin
+  mostrarTrabajos(); // refrescar para ocultar botón eliminar
 });
 
-// ==========================
-// FIREBASE CONFIG
-// ==========================
-const storage = firebase.storage();
-const db = firebase.firestore();
-
-// ==========================
-// ELEMENTOS
-// ==========================
+// Guardar trabajos en localStorage
 const uploadForm = document.getElementById("uploadForm");
 const trabajosList = document.getElementById("trabajosList");
+let trabajos = JSON.parse(localStorage.getItem("trabajos")) || [];
 
-// Modal para ver archivos
-const verModal = document.createElement("div");
-verModal.id = "verModal";
-verModal.style.display = "none";
-verModal.style.position = "fixed";
-verModal.style.top = "0";
-verModal.style.left = "0";
-verModal.style.width = "100%";
-verModal.style.height = "100%";
-verModal.style.backgroundColor = "rgba(0,0,0,0.7)";
-verModal.style.zIndex = "9999";
-verModal.innerHTML = `
-  <div style="position:relative; margin:50px auto; background:#fff; padding:10px; width:80%; height:80%; border-radius:8px;">
-    <span id="cerrarVerModal" style="position:absolute; top:10px; right:20px; font-size:24px; cursor:pointer;">&times;</span>
-    <embed id="archivoVista" src="" type="application/pdf" width="100%" height="100%" />
-  </div>
-`;
-document.body.appendChild(verModal);
-
-const archivoVista = document.getElementById("archivoVista");
-const cerrarVerModal = document.getElementById("cerrarVerModal");
-
-// Cerrar modal de ver archivos
-cerrarVerModal.onclick = () => verModal.style.display = "none";
-
-// Cerrar modales haciendo click fuera
-window.addEventListener("click", (e) => {
-  if (e.target === verModal) verModal.style.display = "none";
-  if (e.target === loginModal) loginModal.style.display = "none";
-});
-
-// ==========================
-// MOSTRAR TRABAJOS DESDE FIRESTORE
-// ==========================
-async function mostrarTrabajos(filtroCurso = null) {
+function mostrarTrabajos(filtroCurso = null) {
   trabajosList.innerHTML = "";
+  trabajos
+    .filter(t => !filtroCurso || t.curso === filtroCurso)
+    .forEach((t, index) => {
+      const card = document.createElement("div");
+      card.classList.add("trabajo-card");
+      card.innerHTML = `
+        <h3>${t.titulo}</h3>
+        <p><strong>Curso:</strong> ${t.curso}</p>
+        <p><strong>Fecha:</strong> ${t.fecha}</p>
+        <embed src="${t.archivo}" width="100%" height="150px" type="application/pdf"/>
+        <a href="${t.archivo}" download="${t.titulo}">Descargar</a>
+        ${esAdmin ? `<button class="deleteBtn" data-index="${index}">Eliminar</button>` : ""}
+      `;
+      trabajosList.appendChild(card);
+    });
 
-  let query = db.collection("trabajos");
-  if (filtroCurso) query = query.where("curso", "==", filtroCurso);
-
-  const snapshot = await query.orderBy("fecha", "desc").get();
-
-  snapshot.forEach((doc) => {
-    const t = doc.data();
-    const id = doc.id;
-
-    const card = document.createElement("div");
-    card.classList.add("trabajo-card");
-    card.innerHTML = `
-      <h3>${t.titulo}</h3>
-      <p><strong>Curso:</strong> ${t.curso}</p>
-      <p><strong>Fecha:</strong> ${t.fecha}</p>
-      <embed src="${t.archivo}" width="100%" height="150px" type="application/pdf"/>
-      <a href="${t.archivo}" target="_blank" download>Descargar</a>
-      <button class="verBtn" data-archivo="${t.archivo}">Ver</button>
-      ${esAdmin ? `<button class="deleteBtn" data-id="${id}">Eliminar</button>` : ""}
-    `;
-    trabajosList.appendChild(card);
-  });
-
-  // Botón eliminar solo para admin
+  // Activar botón eliminar solo si es admin
   if (esAdmin) {
     document.querySelectorAll(".deleteBtn").forEach(btn => {
-      btn.addEventListener("click", async (e) => {
-        const id = e.target.dataset.id;
-        if (confirm("¿Seguro que quieres eliminar este trabajo?")) {
-          await db.collection("trabajos").doc(id).delete();
-          mostrarTrabajos(filtroCurso);
-        }
+      btn.addEventListener("click", (e) => {
+        const idx = e.target.dataset.index;
+        trabajos.splice(idx, 1);
+        localStorage.setItem("trabajos", JSON.stringify(trabajos));
+        mostrarTrabajos(filtroCurso);
       });
     });
   }
-
-  // Botón ver archivo
-  document.querySelectorAll(".verBtn").forEach(btn => {
-    btn.addEventListener("click", (e) => {
-      const archivo = e.target.dataset.archivo;
-      archivoVista.src = archivo;
-      verModal.style.display = "block";
-    });
-  });
 }
 
-// ==========================
-// SUBIR TRABAJOS A FIREBASE
-// ==========================
-uploadForm.addEventListener("submit", async (e) => {
+uploadForm.addEventListener("submit", (e) => {
   e.preventDefault();
   const titulo = document.getElementById("titulo").value;
   const curso = document.getElementById("cursoSelect").value;
@@ -151,31 +78,27 @@ uploadForm.addEventListener("submit", async (e) => {
 
   if (archivoInput.files.length > 0) {
     const archivo = archivoInput.files[0];
-    const storageRef = storage.ref().child(`trabajos/${Date.now()}_${archivo.name}`);
+    const reader = new FileReader();
 
-    // Subir archivo
-    await storageRef.put(archivo);
+    reader.onload = function(e) {
+      const archivoBase64 = e.target.result; // archivo convertido a Base64
+      const nuevoTrabajo = {
+        titulo,
+        curso,
+        archivo: archivoBase64, // guardamos el archivo en base64
+        fecha: new Date().toLocaleDateString()
+      };
+      trabajos.push(nuevoTrabajo);
+      localStorage.setItem("trabajos", JSON.stringify(trabajos));
+      mostrarTrabajos(curso);
+      uploadForm.reset();
+    };
 
-    // Obtener URL de descarga
-    const archivoURL = await storageRef.getDownloadURL();
-
-    // Guardar en Firestore
-    await db.collection("trabajos").add({
-      titulo,
-      curso,
-      archivo: archivoURL,
-      fecha: new Date().toLocaleDateString()
-    });
-
-    alert("Trabajo subido correctamente ✅");
-    mostrarTrabajos(curso);
-    uploadForm.reset();
+    reader.readAsDataURL(archivo); // convierte el archivo a base64
   }
 });
 
-// ==========================
-// FILTRO POR CURSO
-// ==========================
+// Filtro por curso
 document.querySelectorAll(".curso-card").forEach(card => {
   card.addEventListener("click", () => {
     const curso = card.dataset.curso;
@@ -183,7 +106,5 @@ document.querySelectorAll(".curso-card").forEach(card => {
   });
 });
 
-// ==========================
-// MOSTRAR TODOS AL INICIO
-// ==========================
+// Mostrar todos al inicio
 mostrarTrabajos();
