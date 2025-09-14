@@ -111,26 +111,17 @@ uploadForm.addEventListener("submit", (e) => {
   const archivoInput = document.getElementById("archivo");
 
   if (archivoInput.files.length > 0) {
-    const archivo = archivoInput.files[0];
-    const reader = new FileReader();
-
-    reader.onload = function(event) {
-      const archivoBase64 = event.target.result; // 🔑 contenido codificado en Base64
-
-      const nuevoTrabajo = {
-        titulo,
-        curso,
-        archivo: archivoBase64, // guardamos base64
-        fecha: new Date().toLocaleDateString()
-      };
-
-      trabajos.push(nuevoTrabajo);
-      localStorage.setItem("trabajos", JSON.stringify(trabajos));
-      mostrarTrabajos(curso);
-      uploadForm.reset();
+    const archivoURL = URL.createObjectURL(archivoInput.files[0]);
+    const nuevoTrabajo = {
+      titulo,
+      curso,
+      archivo: archivoURL,
+      fecha: new Date().toLocaleDateString()
     };
-
-    reader.readAsDataURL(archivo); // convierte a base64
+    trabajos.push(nuevoTrabajo);
+    localStorage.setItem("trabajos", JSON.stringify(trabajos));
+    mostrarTrabajos(curso);
+    uploadForm.reset();
   }
 });
 
