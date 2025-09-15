@@ -138,3 +138,37 @@ mostrarTrabajos();
 
 
 
+function mostrarTrabajos(curso) {
+  const lista = document.getElementById("trabajosList");
+  lista.innerHTML = ""; // limpia lo anterior
+
+  if (curso === "investigacion") {
+    lista.innerHTML = `
+      <div class="trabajo-card">
+        <h3>Constancia de Matrícula</h3>
+        <p><strong>Curso:</strong> Investigación</p>
+        <p><strong>Fecha:</strong> 14/9/2025</p>
+
+        <!-- Visor del PDF -->
+        <embed src="archivos/mapa de procesos.pdf" width="100%" height="400px" type="application/pdf"/>
+
+        <!-- Botones -->
+        <a href="archivos/mapa de procesos.pdf" download style="color: yellow; font-weight: bold;">Descargar</a>
+        <button onclick="window.open('archivos/mapa de procesos.pdf','_blank')">Ver</button>
+      </div>
+    `;
+  } else {
+    lista.innerHTML = `
+      <div class="trabajo-card">
+        <h3>No hay trabajos disponibles para este curso.</h3>
+      </div>
+    `;
+  }
+}
+
+// 👉 Vincula cada curso con la función
+document.querySelectorAll(".curso-card").forEach(card => {
+  card.addEventListener("click", () => {
+    mostrarTrabajos(card.dataset.curso);
+  });
+});
