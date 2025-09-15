@@ -126,5 +126,31 @@
 
   
   <script src="script.js"></script>
+
+
+  <section id="proyectos" class="proyectos-section">
+  <h2>Trabajos del Curso Seleccionado</h2>
+
+  <!-- Filtros por tiempo -->
+  <div class="filtros">
+    <label for="filtroTiempo">Filtrar por tiempo:</label>
+    <select id="filtroTiempo">
+      <option value="todos">Todos</option>
+      <option value="hoy">Hoy</option>
+      <option value="semana">Esta semana</option>
+      <option value="mes">Este mes</option>
+    </select>
+  </div>
+
+  <!-- 📌 Aquí agregamos un trabajo fijo para Investigación -->
+  <div class="trabajo-card investigacion">
+    <h3>Trabajo de Investigación</h3>
+    <a href="archivos/mapa de procesos.pdf" target="_blank">📂 Ver Documento PDF</a>
+  </div>
+
+  <!-- Aquí se cargarán los demás trabajos dinámicamente -->
+  <div id="trabajosList" class="trabajos-list"></div>
+</section>
+
 </body>
 </html>
