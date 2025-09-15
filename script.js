@@ -108,13 +108,14 @@ uploadForm.addEventListener("submit", (e) => {
   e.preventDefault();
   const titulo = document.getElementById("titulo").value;
   const curso = document.getElementById("cursoSelect").value;
-  const archivoRuta = document.getElementById("rutaArchivo").value; // <<--- usamos ruta
+  const archivoInput = document.getElementById("archivo");
 
-  if (archivoRuta.trim() !== "") {
+  if (archivoInput.files.length > 0) {
+    const archivoURL = URL.createObjectURL(archivoInput.files[0]);
     const nuevoTrabajo = {
       titulo,
       curso,
-      archivo: archivoRuta, // guarda la ruta relativa
+      archivo: archivoURL,
       fecha: new Date().toLocaleDateString()
     };
     trabajos.push(nuevoTrabajo);
