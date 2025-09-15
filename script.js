@@ -135,4 +135,3 @@ document.querySelectorAll(".curso-card").forEach(card => {
 
 // Mostrar todos al inicio
 mostrarTrabajos();
-
