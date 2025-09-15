@@ -108,21 +108,26 @@ uploadForm.addEventListener("submit", (e) => {
   e.preventDefault();
   const titulo = document.getElementById("titulo").value;
   const curso = document.getElementById("cursoSelect").value;
-  const archivoRuta = document.getElementById("rutaArchivo").value; // <<--- usamos ruta
+  const archivoInput = document.getElementById("archivo");
 
-  if (archivoRuta.trim() !== "") {
+  if (archivoInput.files.length > 0) {
+    const archivoNombre = archivoInput.files[0].name; // ej: trabajo1.pdf
+    const archivoURL = `https://danielhinostroza.github.io/MiPortafolio/archivos/${archivoNombre}`;
+
     const nuevoTrabajo = {
       titulo,
       curso,
-      archivo: archivoRuta, // guarda la ruta relativa
+      archivo: archivoURL,
       fecha: new Date().toLocaleDateString()
     };
+
     trabajos.push(nuevoTrabajo);
     localStorage.setItem("trabajos", JSON.stringify(trabajos));
     mostrarTrabajos(curso);
     uploadForm.reset();
   }
 });
+
 
 // Filtro por curso
 document.querySelectorAll(".curso-card").forEach(card => {
