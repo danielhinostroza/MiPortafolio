@@ -128,7 +128,8 @@
   <script src="script.js"></script>
 
 
-  <section id="proyectos" class="proyectos-section">
+ <!-- Proyectos -->
+<section id="proyectos" class="proyectos-section">
   <h2>Trabajos del Curso Seleccionado</h2>
 
   <!-- Filtros por tiempo -->
@@ -142,15 +143,25 @@
     </select>
   </div>
 
-  <!-- 📌 Aquí agregamos un trabajo fijo para Investigación -->
-  <div class="trabajo-card investigacion">
-    <h3>Trabajo de Investigación</h3>
-    <a href="archivos/mapa de procesos.pdf" target="_blank">📂 Ver Documento PDF</a>
-  </div>
+  <div id="trabajosList" class="trabajos-list">
+    
+    <!-- 📄 Documento fijo en Investigación -->
+    <div class="trabajo-card">
+      <h3>Constancia de Matrícula</h3>
+      <p><strong>Curso:</strong> investigación</p>
+      <p><strong>Fecha:</strong> 14/9/2025</p>
 
-  <!-- Aquí se cargarán los demás trabajos dinámicamente -->
-  <div id="trabajosList" class="trabajos-list"></div>
+      <!-- Visor del PDF -->
+      <embed src="archivos/mapa de procesos.pdf" width="100%" height="400px" type="application/pdf"/>
+
+      <!-- Botones -->
+      <a href="archivos/mapa de procesos.pdf" download style="color: yellow; font-weight: bold;">Descargar</a>
+      <button onclick="window.open('archivos/miTrabajo.pdf','_blank')">Ver</button>
+    </div>
+
+  </div>
 </section>
+
 
 </body>
 </html>
