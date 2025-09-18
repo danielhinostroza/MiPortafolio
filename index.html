@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Portafolio de Ingeniería de Sistemas</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <header>
+    <div class="logo">🎓 Mi Portafolio</div>
+    <nav>
+      <ul>
+        <li><a href="#about">Sobre mí</a></li>
+        <li><a href="#cursos">Cursos</a></li>
+        <li><a href="#proyectos">Proyectos</a></li>
+        <li><a href="#adminPanel">Panel Admin</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section id="about">
+    <h1>Bienvenido a mi Portafolio</h1>
+    <p>Hola, soy estudiante de Ingeniería de Sistemas y aquí encontrarás mis trabajos y proyectos.</p>
+  </section>
+
+  <section id="cursos">
+    <h2>Cursos</h2>
+    <div class="cursos-list">
+      <button onclick="mostrarTrabajos('investigacion')">Investigación</button>
+      <button onclick="mostrarTrabajos('calculo')">Cálculo</button>
+      <button onclick="mostrarTrabajos('programacion')">Programación</button>
+    </div>
+    <div id="trabajosList" class="trabajos-container"></div>
+  </section>
+
+  <section id="proyectos">
+    <h2>Proyectos Personales</h2>
+    <p>Aquí irán proyectos destacados.</p>
+  </section>
+
+  <section id="adminPanel">
+    <h2>Panel Administrativo</h2>
+    <form id="uploadForm">
+      <input type="text" id="titulo" placeholder="Título del trabajo" required>
+      <select id="curso" required>
+        <option value="">Selecciona curso</option>
+        <option value="investigacion">Investigación</option>
+        <option value="calculo">Cálculo</option>
+        <option value="programacion">Programación</option>
+      </select>
+      <input type="file" id="archivo" accept=".pdf,.docx,.pptx,.jpg,.png" required>
+      <button type="submit">Subir Trabajo</button>
+    </form>
+  </section>
+
+  <!-- Modal para mostrar archivo -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="cerrarModal()">&times;</span>
+      <iframe id="modalFrame" width="100%" height="500px"></iframe>
+    </div>
+  </div>
+
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <!-- Tu script -->
+  <script src="script.js"></script>
+</body>
+</html>
