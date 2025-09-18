@@ -55,18 +55,26 @@ logoutBtn.addEventListener("click", async () => {
 });
 
 // === SUBIR ARCHIVO ===
+// 📂 SUBIR ARCHIVO
 uploadForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const titulo = document.getElementById("titulo").value.trim();
-  const curso = document.getElementById("cursoSelect").value;
-  const archivoInput = document.getElementById("archivo");
-  const file = archivoInput.files[0];
-
-  if (!file) {
-    alert("Selecciona un archivo");
+  // 🔎 Verificar sesión activa
+  const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+  if (sessionError) {
+    console.error("Error al obtener sesión:", sessionError);
+    alert("No se pudo verificar sesión ❌");
     return;
   }
+
+  console.log("👉 Sesión actual:", sessionData); // 👈 Verás en consola si hay user
+
+  const user = sessionData?.session?.user;
+  if (!user) {
+    alert("Debes iniciar sesión antes de subir archivos ❌");
+    return;
+  }
+
 
   // Subir a bucket "trabajos"
   const { data: uploadData, error: uploadError } = await supabase.storage
