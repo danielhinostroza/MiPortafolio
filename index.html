@@ -24,10 +24,7 @@
     <section id="about" class="about">
       <img src="imagenes/WhatsApp Image 2025-09-14 at 10.53.54 AM.jpeg" alt="Foto personal" class="profile-pic"/>
       <h1>Hola, soy Ingeniero de Sistemas</h1>
-      <p>
-        Me especializo en desarrollo de software, diseño de sistemas y soluciones tecnológicas.
-        Aquí comparto mis proyectos y trabajos organizados por curso.
-      </p>
+      <p> Me especializo en desarrollo de software, diseño de sistemas y soluciones tecnológicas. Aquí comparto mis proyectos y trabajos organizados por curso. </p>
     </section>
 
     <!-- Cursos -->
@@ -48,8 +45,6 @@
     <!-- Proyectos -->
     <section id="proyectos" class="proyectos-section">
       <h2>Trabajos del Curso Seleccionado</h2>
-
-      <!-- Filtros por tiempo -->
       <div class="filtros">
         <label for="filtroTiempo">Filtrar por tiempo:</label>
         <select id="filtroTiempo">
@@ -59,79 +54,48 @@
           <option value="mes">Este mes</option>
         </select>
       </div>
-
       <div id="trabajosList" class="trabajos-list"></div>
     </section>
-
-
-    <!-- Modal Login -->
-    <div id="loginModal" class="modal">
-      <div class="modal-content">
-        <span class="closeBtn">&times;</span>
-        <h2>Acceso Administrador</h2>
-        <form id="loginForm">
-          <label for="email">Usuario</label>
-          <input type="email" id="email" placeholder="admin@portafolio.com" required>
-          <label for="password">Contraseña</label>
-          <input type="password" id="password" placeholder="1234" required>
-          <button type="submit" class="btn-login">Entrar</button>
-        </form>
-      </div>
-    </div>
-
-    <!-- Panel Admin -->
-    <div id="adminPanel" class="admin-panel hidden">
-      <h2>Panel de Administración</h2>
-      <button id="logoutBtn" class="btn-logout">Cerrar Sesión</button>
-      <form id="uploadForm">
-        <input type="text" id="titulo" placeholder="Título del trabajo" required>
-        <select id="cursoSelect">
-          <option value="programacion">Programación</option>
-          <option value="software">Diseño de Software</option>
-          <option value="investigacion">Investigación</option>
-          <option value="grafico">Diseño Gráfico</option>
-          <option value="redes">Redes</option>
-          <option value="bases">Bases de Datos</option>
-          <option value="ia">Inteligencia Artificial</option>
-          <option value="seguridad">Seguridad Informática</option>
-        </select>
-        <input type="file" id="archivo" required>
-        <button type="submit">Subir Trabajo</button>
-      </form>
-    </div>
   </main>
 
-  <!-- Supabase SDK -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-  <script>
-    const SUPABASE_URL = "https://unmspywowybnleivempq.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVubXNweXdvd3libmxlaXZlbXBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxNTI0NzYsImV4cCI6MjA3MzcyODQ3Nn0.lVDA_rXPqnYbod8CQjZJJUHsuXs8mmJqzzSPIFfI-eU";
+  <!-- Modal Login -->
+  <div id="loginModal" class="modal">
+    <div class="modal-content">
+      <span class="closeBtn">&times;</span>
+      <h2>Acceso Administrador</h2>
+      <form id="loginForm">
+        <label for="email">Usuario</label>
+        <input type="email" id="email" placeholder="admin@portafolio.com" required>
+        <label for="password">Contraseña</label>
+        <input type="password" id="password" placeholder="1234" required>
+        <button type="submit" class="btn-login">Entrar</button>
+      </form>
+    </div>
+  </div>
 
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  <!-- Panel Admin -->
+  <div id="adminPanel" class="admin-panel hidden">
+    <h2>Panel de Administración</h2>
+    <button id="logoutBtn" class="btn-logout">Cerrar Sesión</button>
+    <form id="uploadForm">
+      <input type="text" id="titulo" placeholder="Título del trabajo" required>
+      <select id="cursoSelect">
+        <option value="programacion">Programación</option>
+        <option value="software">Diseño de Software</option>
+        <option value="investigacion">Investigación</option>
+        <option value="grafico">Diseño Gráfico</option>
+        <option value="redes">Redes</option>
+        <option value="bases">Bases de Datos</option>
+        <option value="ia">Inteligencia Artificial</option>
+        <option value="seguridad">Seguridad Informática</option>
+      </select>
+      <input type="file" id="archivo" required>
+      <button type="submit">Subir Trabajo</button>
+    </form>
+  </div>
 
-    // --- Lógica para que funcione el botón Administrador ---
-    const adminBtn = document.getElementById("adminBtn");
-    const loginModal = document.getElementById("loginModal");
-    const closeBtn = document.querySelector(".closeBtn");
-
-    // Abrir modal al hacer clic en Administrador
-    adminBtn.addEventListener("click", () => {
-      loginModal.style.display = "block";
-    });
-
-    // Cerrar modal al hacer clic en la X
-    closeBtn.addEventListener("click", () => {
-      loginModal.style.display = "none";
-    });
-
-    // Cerrar modal si se hace clic fuera del contenido
-    window.addEventListener("click", (e) => {
-      if (e.target === loginModal) {
-        loginModal.style.display = "none";
-      }
-    });
-  </script>
-
+  <!-- 🚀 Importar librería de Supabase -->
+  <script src="https://unpkg.com/@supabase/supabase-js"></script>
   <script src="script.js"></script>
 </body>
 </html>
