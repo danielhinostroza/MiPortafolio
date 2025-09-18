@@ -1,6 +1,6 @@
 // 🚀 Configuración de Supabase
 const SUPABASE_URL = "https://unmspywowybnleivempq.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVubXNweXdvd3libmxlaXZlbXBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxNTI0NzYsImV4cCI6MjA3MzcyODQ3Nn0.lVDA_rXPqnYbod8CQjZJJUHsuXs8mmJqzzSPIFfI-eU"; // 👈 Revisa en Supabase → Settings → API → anon key
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVubXNweXdvd3libmxlaXZlbXBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxNTI0NzYsImV4cCI6MjA3MzcyODQ3Nn0.lVDA_rXPqnYbod8CQjZJJUHsuXs8mmJqzzSPIFfI-eU"; 
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Modal login
@@ -17,22 +17,33 @@ adminBtn.onclick = () => loginModal.style.display = "block";
 closeBtn.onclick = () => loginModal.style.display = "none";
 window.onclick = (e) => { if (e.target === loginModal) loginModal.style.display = "none"; };
 
-loginForm.addEventListener("submit", (e) => {
+// 🔑 LOGIN CON SUPABASE AUTH
+loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
-  if (email === "admin@portafolio.com" && password === "1234") {
-    alert("Bienvenido Administrador");
-    loginModal.style.display = "none";
-    adminPanel.classList.remove("hidden");
-    esAdmin = true;
-    cargarTrabajos();
-  } else {
-    alert("Credenciales incorrectas");
+
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+
+  if (error) {
+    alert("Credenciales incorrectas ❌");
+    console.error(error);
+    return;
   }
+
+  alert("Bienvenido " + data.user.email + " ✅");
+  loginModal.style.display = "none";
+  adminPanel.classList.remove("hidden");
+  esAdmin = true;
+  cargarTrabajos();
 });
 
-logoutBtn.addEventListener("click", () => {
+// 🔒 CERRAR SESIÓN
+logoutBtn.addEventListener("click", async () => {
+  await supabase.auth.signOut();
   adminPanel.classList.add("hidden");
   alert("Sesión cerrada");
   esAdmin = false;
@@ -43,7 +54,7 @@ logoutBtn.addEventListener("click", () => {
 const uploadForm = document.getElementById("uploadForm");
 const trabajosList = document.getElementById("trabajosList");
 
-// SUBIR ARCHIVO A SUPABASE
+// 📂 SUBIR ARCHIVO A SUPABASE STORAGE
 uploadForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const titulo = document.getElementById("titulo").value;
@@ -56,7 +67,7 @@ uploadForm.addEventListener("submit", async (e) => {
 
     // Subir archivo al bucket "trabajos"
     const { data, error } = await supabase.storage
-      .from("trabajos") // 👈 Asegúrate que tu bucket se llame así
+      .from("trabajos") // asegúrate que tu bucket se llame así
       .upload(nombreArchivo, archivo, {
         cacheControl: "3600",
         upsert: false
@@ -72,7 +83,7 @@ uploadForm.addEventListener("submit", async (e) => {
       .from("trabajos")
       .getPublicUrl(nombreArchivo);
 
-    // Guardar metadata en la tabla "trabajos"
+    // Guardar metadata en tabla "trabajos"
     const { error: insertError } = await supabase.from("trabajos").insert([
       { titulo, curso, archivo: urlData.publicUrl, fecha: new Date().toLocaleDateString() }
     ]);
@@ -89,7 +100,7 @@ uploadForm.addEventListener("submit", async (e) => {
   }
 });
 
-// CARGAR TRABAJOS DESDE SUPABASE
+// 📥 CARGAR TRABAJOS DESDE SUPABASE
 async function cargarTrabajos(curso = null) {
   const { data: trabajos, error } = await supabase.from("trabajos").select("*");
 
@@ -120,7 +131,7 @@ async function cargarTrabajos(curso = null) {
   });
 }
 
-// ELIMINAR TRABAJO
+// 🗑️ ELIMINAR TRABAJO
 async function eliminarTrabajo(id) {
   if (confirm("¿Seguro que deseas eliminar este trabajo?")) {
     const { error } = await supabase.from("trabajos").delete().eq("id", id);
@@ -133,7 +144,7 @@ async function eliminarTrabajo(id) {
   }
 }
 
-// FILTRO POR CURSO
+// 🎓 FILTRO POR CURSO
 document.querySelectorAll(".curso-card").forEach(card => {
   card.addEventListener("click", () => {
     const curso = card.dataset.curso;
