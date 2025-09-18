@@ -24,7 +24,7 @@
     <section id="about" class="about">
       <img src="imagenes/WhatsApp Image 2025-09-14 at 10.53.54 AM.jpeg" alt="Foto personal" class="profile-pic"/>
       <h1>Hola, soy Ingeniero de Sistemas</h1>
-      <p> Me especializo en desarrollo de software, diseño de sistemas y soluciones tecnológicas. Aquí comparto mis proyectos y trabajos organizados por curso. </p>
+      <p>Me especializo en desarrollo de software, diseño de sistemas y soluciones tecnológicas. Aquí comparto mis proyectos y trabajos organizados por curso.</p>
     </section>
 
     <!-- Cursos -->
@@ -45,15 +45,6 @@
     <!-- Proyectos -->
     <section id="proyectos" class="proyectos-section">
       <h2>Trabajos del Curso Seleccionado</h2>
-      <div class="filtros">
-        <label for="filtroTiempo">Filtrar por tiempo:</label>
-        <select id="filtroTiempo">
-          <option value="todos">Todos</option>
-          <option value="hoy">Hoy</option>
-          <option value="semana">Esta semana</option>
-          <option value="mes">Este mes</option>
-        </select>
-      </div>
       <div id="trabajosList" class="trabajos-list"></div>
     </section>
   </main>
@@ -78,7 +69,6 @@
     <h2>Panel de Administración</h2>
     <button id="logoutBtn" class="btn-logout">Cerrar Sesión</button>
     <form id="uploadForm">
-      <!-- 🔹 Corregido: ahora es id="nombre" -->
       <input type="text" id="nombre" placeholder="Título del trabajo" required>
       <select id="cursoSelect">
         <option value="programacion">Programación</option>
@@ -91,11 +81,12 @@
         <option value="seguridad">Seguridad Informática</option>
       </select>
       <input type="file" id="archivo" required>
-      <button type="submit">Subir Trabajo</button>
+      <!-- ✅ Botón corregido -->
+      <button id="uploadBtn" type="submit">📤 Subir Trabajo</button>
     </form>
   </div>
 
-  <!-- 🚀 Importar librería de Supabase -->
+  <!-- 🚀 Supabase -->
   <script src="https://unpkg.com/@supabase/supabase-js"></script>
   <script src="script.js"></script>
 </body>
