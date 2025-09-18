@@ -1,3 +1,8 @@
+// 🚀 Configuración de Supabase
+const SUPABASE_URL = "https://unmspywowybnleivempq.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVubXNweXdvd3libmxlaXZlbXBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxNTI0NzYsImV4cCI6MjA3MzcyODQ3Nn0.lVDA_rXPqnYbod8CQjZJJUHsuXs8mmJqzzSPIFfI-eU";
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 // Modal login
 const adminBtn = document.getElementById("adminBtn");
 const loginModal = document.getElementById("loginModal");
@@ -49,9 +54,9 @@ uploadForm.addEventListener("submit", async (e) => {
     const archivo = archivoInput.files[0];
     const nombreArchivo = Date.now() + "_" + archivo.name;
 
-    // Subir a Supabase Storage
+    // Subir a Supabase Storage (bucket "trabajos")
     let { data, error } = await supabase.storage
-      .from("archivos") // 🔹 Asegúrate de crear un bucket llamado "archivos"
+      .from("trabajos")
       .upload(nombreArchivo, archivo);
 
     if (error) {
@@ -60,15 +65,15 @@ uploadForm.addEventListener("submit", async (e) => {
     }
 
     const { data: urlData } = supabase.storage
-      .from("archivos")
+      .from("trabajos")
       .getPublicUrl(nombreArchivo);
 
-    // Guardar en Supabase Database
+    // Guardar metadata en la tabla "trabajos"
     await supabase.from("trabajos").insert([
       { titulo, curso, archivo: urlData.publicUrl, fecha: new Date().toLocaleDateString() }
     ]);
 
-    alert("Trabajo subido con éxito");
+    alert("Trabajo subido con éxito ✅");
     uploadForm.reset();
     cargarTrabajos();
   }
