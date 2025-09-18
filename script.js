@@ -1,7 +1,7 @@
-// 🚀 Inicializar Supabase con tus credenciales reales
+// 🚀 Inicializar Supabase
 const supabase = window.supabase.createClient(
-  "https://fbyjhfzzkkwzvscxuqrf.supabase.co", // 👈 tu URL ya puesta
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." // 👈 tu anon key ya puesta
+  "https://fbyjhfzzkkwzvscxuqrf.supabase.co", // tu URL
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." // tu anon key
 );
 
 // === ELEMENTOS ===
@@ -27,8 +27,8 @@ closeBtn.addEventListener("click", () => {
 loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value.trim();
+  const email = document.getElementById("login-email").value.trim();
+  const password = document.getElementById("login-password").value.trim();
 
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
