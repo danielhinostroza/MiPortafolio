@@ -46,107 +46,70 @@
     </section>
 
     <!-- Proyectos -->
-   <section id="proyectos" class="proyectos-section">
-  <h2>Trabajos del Curso Seleccionado</h2>
+    <section id="proyectos" class="proyectos-section">
+      <h2>Trabajos del Curso Seleccionado</h2>
 
-  <!-- Filtros por tiempo -->
-  <div class="filtros">
-    <label for="filtroTiempo">Filtrar por tiempo:</label>
-    <select id="filtroTiempo">
-      <option value="todos">Todos</option>
-      <option value="hoy">Hoy</option>
-      <option value="semana">Esta semana</option>
-      <option value="mes">Este mes</option>
-    </select>
-  </div>
+      <!-- Filtros por tiempo -->
+      <div class="filtros">
+        <label for="filtroTiempo">Filtrar por tiempo:</label>
+        <select id="filtroTiempo">
+          <option value="todos">Todos</option>
+          <option value="hoy">Hoy</option>
+          <option value="semana">Esta semana</option>
+          <option value="mes">Este mes</option>
+        </select>
+      </div>
 
-  <div id="trabajosList" class="trabajos-list"></div>
-</section>
+      <div id="trabajosList" class="trabajos-list"></div>
+    </section>
 
 
-  <!-- Modal Login -->
-  <div id="loginModal" class="modal">
-    <div class="modal-content">
-      <span class="closeBtn">&times;</span>
-      <h2>Acceso Administrador</h2>
-      <form id="loginForm">
-        <label for="email">Usuario</label>
-        <input type="email" id="email" placeholder="admin@portafolio.com" required>
-        <label for="password">Contraseña</label>
-        <input type="password" id="password" placeholder="1234" required>
-        <button type="submit" class="btn-login">Entrar</button>
+    <!-- Modal Login -->
+    <div id="loginModal" class="modal">
+      <div class="modal-content">
+        <span class="closeBtn">&times;</span>
+        <h2>Acceso Administrador</h2>
+        <form id="loginForm">
+          <label for="email">Usuario</label>
+          <input type="email" id="email" placeholder="admin@portafolio.com" required>
+          <label for="password">Contraseña</label>
+          <input type="password" id="password" placeholder="1234" required>
+          <button type="submit" class="btn-login">Entrar</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Panel Admin -->
+    <div id="adminPanel" class="admin-panel hidden">
+      <h2>Panel de Administración</h2>
+      <button id="logoutBtn" class="btn-logout">Cerrar Sesión</button>
+      <form id="uploadForm">
+        <input type="text" id="titulo" placeholder="Título del trabajo" required>
+        <select id="cursoSelect">
+          <option value="programacion">Programación</option>
+          <option value="software">Diseño de Software</option>
+          <option value="investigacion">Investigación</option>
+          <option value="grafico">Diseño Gráfico</option>
+          <option value="redes">Redes</option>
+          <option value="bases">Bases de Datos</option>
+          <option value="ia">Inteligencia Artificial</option>
+          <option value="seguridad">Seguridad Informática</option>
+        </select>
+        <input type="file" id="archivo" required>
+        <button type="submit">Subir Trabajo</button>
       </form>
     </div>
-  </div>
+  </main>
 
-  <!-- Panel Admin (oculto por defecto) -->
-  <div id="adminPanel" class="admin-panel hidden">
-    <h2>Panel de Administración</h2>
-    <button id="logoutBtn" class="btn-logout">Cerrar Sesión</button>
-    <form id="uploadForm">
-      <input type="text" id="titulo" placeholder="Título del trabajo" required>
-      <select id="cursoSelect">
-        <option value="programacion">Programación</option>
-        <option value="software">Diseño de Software</option>
-        <option value="investigacion">Investigación</option>
-        <option value="grafico">Diseño Gráfico</option>
-        <option value="redes">Redes</option>
-        <option value="bases">Bases de Datos</option>
-        <option value="ia">Inteligencia Artificial</option>
-        <option value="seguridad">Seguridad Informática</option>
-      </select>
-      <input type="file" id="archivo" required>
-      <button type="submit">Subir Trabajo</button>
-    </form>
-  </div>
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script>
+    const SUPABASE_URL = "https://unmspywowybnleivempq.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVubXNweXdvd3libmxlaXZlbXBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxNTI0NzYsImV4cCI6MjA3MzcyODQ3Nn0.lVDA_rXPqnYbod8CQjZJJUHsuXs8mmJqzzSPIFfI-eU";
 
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  </script>
 
-<!-- Firebase SDKs -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
-
-<script>
-  // Tu configuración real de Firebase (corrigiendo storageBucket)
-  const firebaseConfig = {
-    apiKey: "AIzaSyAWXt_ALsNJ25o9gwqa0NjVzQhXE4HQE60",
-    authDomain: "portafolio-993a6.firebaseapp.com",
-    projectId: "portafolio-993a6",
-    storageBucket: "portafolio-993a6.appspot.com",
-    messagingSenderId: "743033903125",
-    appId: "1:743033903125:web:d8c1a7144a290db4bc161c",
-    measurementId: "G-4R029XTYLN"
-  };
-
-  // Inicializa Firebase
-  const app = firebase.initializeApp(firebaseConfig);
-  const storage = firebase.storage();
-  const db = firebase.firestore();
-</script>
-
-  
   <script src="script.js"></script>
-
-
-<!-- Proyectos -->
-<section id="proyectos" class="proyectos-section">
-  <h2>Trabajos del Curso Seleccionado</h2>
-
-  <!-- Filtros por tiempo -->
-  <div class="filtros">
-    <label for="filtroTiempo">Filtrar por tiempo:</label>
-    <select id="filtroTiempo">
-      <option value="todos">Todos</option>
-      <option value="hoy">Hoy</option>
-      <option value="semana">Esta semana</option>
-      <option value="mes">Este mes</option>
-    </select>
-  </div>
-
-  <!-- Aquí se insertarán los trabajos dinámicamente -->
-  <div id="trabajosList" class="trabajos-list"></div>
-</section>
-
-
 </body>
 </html>
