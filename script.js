@@ -63,7 +63,13 @@ uploadForm.addEventListener("submit", async (e) => {
 
   if (archivoInput.files.length > 0) {
     const archivo = archivoInput.files[0];
-    const nombreArchivo = Date.now() + "_" + archivo.name;
+
+    // 🔧 Limpiar nombre del archivo
+    let nombreLimpio = archivo.name.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // quita tildes
+    nombreLimpio = nombreLimpio.replace(/\s+/g, "_"); // reemplaza espacios por _
+    nombreLimpio = nombreLimpio.replace(/[^a-zA-Z0-9._-]/g, ""); // deja solo letras, números, punto y guiones
+
+    const nombreArchivo = Date.now() + "_" + nombreLimpio;
 
     // Subir archivo al bucket "trabajos"
     const { data, error } = await supabase.storage
