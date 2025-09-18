@@ -23,12 +23,9 @@ loginForm.addEventListener("submit", async (e) => {
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
 
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
-  if (error) {
+  if (error || !data.user) {
     alert("Credenciales incorrectas ❌");
     console.error(error);
     return;
@@ -65,19 +62,16 @@ uploadForm.addEventListener("submit", async (e) => {
     const archivo = archivoInput.files[0];
 
     // 🔧 Limpiar nombre del archivo
-    let nombreLimpio = archivo.name.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // quita tildes
-    nombreLimpio = nombreLimpio.replace(/\s+/g, "_"); // reemplaza espacios por _
-    nombreLimpio = nombreLimpio.replace(/[^a-zA-Z0-9._-]/g, ""); // deja solo letras, números, punto y guiones
+    let nombreLimpio = archivo.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    nombreLimpio = nombreLimpio.replace(/\s+/g, "_");
+    nombreLimpio = nombreLimpio.replace(/[^a-zA-Z0-9._-]/g, "");
 
     const nombreArchivo = Date.now() + "_" + nombreLimpio;
 
     // Subir archivo al bucket "trabajos"
     const { data, error } = await supabase.storage
-      .from("trabajos") // asegúrate que tu bucket se llame así
-      .upload(nombreArchivo, archivo, {
-        cacheControl: "3600",
-        upsert: false
-      });
+      .from("trabajos")
+      .upload(nombreArchivo, archivo, { cacheControl: "3600", upsert: false });
 
     if (error) {
       alert("Error al subir archivo: " + error.message);
@@ -89,9 +83,9 @@ uploadForm.addEventListener("submit", async (e) => {
       .from("trabajos")
       .getPublicUrl(nombreArchivo);
 
-    // Guardar metadata en tabla "trabajos"
+    // Guardar metadata en tabla "trabajos" SIN enviar fecha
     const { error: insertError } = await supabase.from("trabajos").insert([
-      { titulo, curso, archivo: urlData.publicUrl, fecha: new Date().toLocaleDateString() }
+      { titulo, curso, archivo: urlData.publicUrl }
     ]);
 
     if (insertError) {
@@ -116,9 +110,7 @@ async function cargarTrabajos(curso = null) {
   }
 
   let lista = trabajos;
-  if (curso) {
-    lista = trabajos.filter(t => t.curso === curso);
-  }
+  if (curso) lista = trabajos.filter(t => t.curso === curso);
 
   trabajosList.innerHTML = "";
   lista.forEach((t) => {
