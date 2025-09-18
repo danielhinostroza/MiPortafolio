@@ -13,9 +13,21 @@ const logoutBtn = document.getElementById("logoutBtn");
 
 let esAdmin = false;
 
+// Abrir/Cerrar modal
 adminBtn.onclick = () => loginModal.style.display = "block";
 closeBtn.onclick = () => loginModal.style.display = "none";
 window.onclick = (e) => { if (e.target === loginModal) loginModal.style.display = "none"; };
+
+// 📌 Recuperar sesión al cargar la página
+supabase.auth.getSession().then(({ data }) => {
+  const user = data?.session?.user;
+  if (user) {
+    console.log("Sesión activa:", user.email);
+    esAdmin = true;
+    adminPanel.classList.remove("hidden");
+    cargarTrabajos();
+  }
+});
 
 // 🔑 LOGIN CON SUPABASE AUTH
 loginForm.addEventListener("submit", async (e) => {
@@ -24,14 +36,15 @@ loginForm.addEventListener("submit", async (e) => {
   const password = document.getElementById("password").value;
 
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  const user = data?.user;
 
-  if (error || !data.user) {
+  if (error || !user) {
     alert("Credenciales incorrectas ❌");
     console.error(error);
     return;
   }
 
-  alert("Bienvenido " + data.user.email + " ✅");
+  alert("Bienvenido " + user.email + " ✅");
   loginModal.style.display = "none";
   adminPanel.classList.remove("hidden");
   esAdmin = true;
@@ -54,6 +67,15 @@ const trabajosList = document.getElementById("trabajosList");
 // 📂 SUBIR ARCHIVO A SUPABASE STORAGE
 uploadForm.addEventListener("submit", async (e) => {
   e.preventDefault();
+
+  // 🔒 Verificar sesión antes de subir archivo
+  const { data: sessionData } = await supabase.auth.getSession();
+  const user = sessionData?.session?.user;
+  if (!user) {
+    alert("Debes iniciar sesión antes de subir archivos ❌");
+    return;
+  }
+
   const titulo = document.getElementById("titulo").value;
   const curso = document.getElementById("cursoSelect").value;
   const archivoInput = document.getElementById("archivo");
@@ -79,6 +101,7 @@ uploadForm.addEventListener("submit", async (e) => {
       return;
     }
 
+    // Obtener URL pública
     const { data: urlData } = supabase.storage
       .from("trabajos")
       .getPublicUrl(nombreArchivo);
