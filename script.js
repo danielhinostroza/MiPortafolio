@@ -1,6 +1,6 @@
 // 🚀 Configuración de Supabase
 const SUPABASE_URL = "https://unmspywowybnleivempq.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVubXNweXdvd3libmxlaXZlbXBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxNTI0NzYsImV4cCI6MjA3MzcyODQ3Nn0.lVDA_rXPqnYbod8CQjZJJUHsuXs8mmJqzzSPIFfI-eU";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVubXNweXdvd3libmxlaXZlbXBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxNTI0NzYsImV4cCI6MjA3MzcyODQ3Nn0.lVDA_rXPqnYbod8CQjZJJUHsuXs8mmJqzzSPIFfI-eU"; // 👈 Revisa en Supabase → Settings → API → anon key
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Modal login
@@ -54,13 +54,17 @@ uploadForm.addEventListener("submit", async (e) => {
     const archivo = archivoInput.files[0];
     const nombreArchivo = Date.now() + "_" + archivo.name;
 
-    // Subir a Supabase Storage (bucket "trabajos")
-    let { data, error } = await supabase.storage
-      .from("trabajos")
-      .upload(nombreArchivo, archivo);
+    // Subir archivo al bucket "trabajos"
+    const { data, error } = await supabase.storage
+      .from("trabajos") // 👈 Asegúrate que tu bucket se llame así
+      .upload(nombreArchivo, archivo, {
+        cacheControl: "3600",
+        upsert: false
+      });
 
     if (error) {
       alert("Error al subir archivo: " + error.message);
+      console.error(error);
       return;
     }
 
@@ -69,9 +73,15 @@ uploadForm.addEventListener("submit", async (e) => {
       .getPublicUrl(nombreArchivo);
 
     // Guardar metadata en la tabla "trabajos"
-    await supabase.from("trabajos").insert([
+    const { error: insertError } = await supabase.from("trabajos").insert([
       { titulo, curso, archivo: urlData.publicUrl, fecha: new Date().toLocaleDateString() }
     ]);
+
+    if (insertError) {
+      alert("Error al guardar en base de datos: " + insertError.message);
+      console.error(insertError);
+      return;
+    }
 
     alert("Trabajo subido con éxito ✅");
     uploadForm.reset();
@@ -81,19 +91,20 @@ uploadForm.addEventListener("submit", async (e) => {
 
 // CARGAR TRABAJOS DESDE SUPABASE
 async function cargarTrabajos(curso = null) {
-  let { data: trabajos, error } = await supabase.from("trabajos").select("*");
+  const { data: trabajos, error } = await supabase.from("trabajos").select("*");
 
   if (error) {
-    console.error(error);
+    console.error("Error al cargar trabajos:", error);
     return;
   }
 
+  let lista = trabajos;
   if (curso) {
-    trabajos = trabajos.filter(t => t.curso === curso);
+    lista = trabajos.filter(t => t.curso === curso);
   }
 
   trabajosList.innerHTML = "";
-  trabajos.forEach((t, index) => {
+  lista.forEach((t) => {
     const card = document.createElement("div");
     card.classList.add("trabajo-card");
     card.innerHTML = `
@@ -112,7 +123,12 @@ async function cargarTrabajos(curso = null) {
 // ELIMINAR TRABAJO
 async function eliminarTrabajo(id) {
   if (confirm("¿Seguro que deseas eliminar este trabajo?")) {
-    await supabase.from("trabajos").delete().eq("id", id);
+    const { error } = await supabase.from("trabajos").delete().eq("id", id);
+    if (error) {
+      console.error("Error al eliminar:", error);
+      alert("Error al eliminar el trabajo");
+      return;
+    }
     cargarTrabajos();
   }
 }
