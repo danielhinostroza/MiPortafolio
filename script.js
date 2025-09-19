@@ -1,7 +1,7 @@
 // 🚀 Inicializar Supabase
 const supabase = window.supabase.createClient(
-  "https://fbyjhfzzkkwzvscxuqrf.supabase.co", // tu URL
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." // tu anon key
+  "https://fbyjhfzzkkwzvscxuqrf.supabase.co", // tu URL del proyecto
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVubXNweXdvd3libmxlaXZlbXBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxNTI0NzYsImV4cCI6MjA3MzcyODQ3Nn0.lVDA_rXPqnYbod8CQjZJJUHsuXs8mmJqzzSPIFfI-eU" // ⚠️ pega la anon key actualizada desde Project Settings > API
 );
 
 // === ELEMENTOS ===
@@ -36,8 +36,8 @@ loginForm.addEventListener("submit", async (e) => {
   });
 
   if (error) {
-    alert("❌ Credenciales incorrectas. Intenta de nuevo.");
-    console.error(error.message);
+    alert("❌ No se pudo iniciar sesión: " + error.message);
+    console.error("Error login:", error);
     return;
   }
 
@@ -68,7 +68,7 @@ uploadForm.addEventListener("submit", async (e) => {
     return;
   }
 
-  // Subir a bucket "trabajos"
+  // Subir al bucket "trabajos"
   const { data: uploadData, error: uploadError } = await supabase.storage
     .from("trabajos")
     .upload(`docs/${Date.now()}_${file.name}`, file);
