@@ -7,7 +7,6 @@ body {
   color: #fff; /* Para que el texto contraste con el fondo */
 }
 
-
 /* Header */
 header {
   display: flex;
@@ -53,7 +52,6 @@ header nav ul li button {
   object-fit: cover;
   margin-bottom: 20px;
 }
-
 
 /* Cursos */
 .cursos-section {
@@ -138,15 +136,6 @@ header nav ul li button {
   border-radius: 6px;
   border: 1px solid #ccc;
 }
-.btn-login {
-  background: #1e3c72;
-  color: #fff;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 6px;
-  font-weight: bold;
-  cursor: pointer;
-}
 .closeBtn {
   float: right;
   font-size: 22px;
@@ -160,15 +149,36 @@ header nav ul li button {
   margin: 20px;
   border-radius: 12px;
 }
-.btn-logout {
-  background: #e63946;
-  color: #fff;
-  padding: 8px 12px;
-  border: none;
-  border-radius: 6px;
-  margin-bottom: 15px;
-  cursor: pointer;
-}
 .hidden {
   display: none;
+}
+
+/* Botones generales */
+button {
+  background: #6a11cb;
+  background: linear-gradient(90deg, #6a11cb, #2575fc);
+  color: #fff;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.3s;
+}
+button:hover {
+  transform: scale(1.05);
+  background: linear-gradient(90deg, #2575fc, #6a11cb);
+}
+.btn-login {
+  margin-top: 10px;
+  width: 100%;
+}
+.btn-register {
+  margin-top: 10px;
+  width: 100%;
+  background: #00b894;
+}
+.btn-logout {
+  background: #e74c3c;
+  margin-bottom: 15px;
 }

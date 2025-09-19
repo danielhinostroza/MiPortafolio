@@ -1,6 +1,6 @@
 // 🚀 Configuración de Supabase
 const SUPABASE_URL = "https://unmspywowybnleivempq.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVubXNweXdvd3libmxlaXZlbXBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxNTI0NzYsImV4cCI6MjA3MzcyODQ3Nn0.lVDA_rXPqnYbod8CQjZJJUHsuXs8mmJqzzSPIFfI-eU";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVubXNweXdvd3libmxlaXZlbXBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxNTI0NzYsImV4cCI6MjA3MzcyODQ3Nn0.lVDA_rXPqnYbod8CQjZJJUHsuXs8mmJqzzSPIFfI-eU"; // ⚠️ pon aquí tu anon key real
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Modal login
@@ -8,8 +8,13 @@ const adminBtn = document.getElementById("adminBtn");
 const loginModal = document.getElementById("loginModal");
 const closeBtn = document.querySelector(".closeBtn");
 const loginForm = document.getElementById("loginForm");
+const registerForm = document.getElementById("registerForm");
 const adminPanel = document.getElementById("adminPanel");
 const logoutBtn = document.getElementById("logoutBtn");
+
+// Formularios y lista
+const uploadForm = document.getElementById("uploadForm");
+const trabajosList = document.getElementById("trabajosList");
 
 let esAdmin = false;
 
@@ -22,33 +27,45 @@ window.onclick = (e) => { if (e.target === loginModal) loginModal.style.display 
 supabase.auth.getSession().then(({ data }) => {
   const user = data?.session?.user;
   if (user) {
-    console.log("Sesión activa:", user.email);
     esAdmin = true;
     adminPanel.classList.remove("hidden");
     cargarTrabajos();
   }
 });
 
-// 🔑 LOGIN CON SUPABASE AUTH
+// 🔑 LOGIN
 loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
+  const email = document.getElementById("login-email").value;
+  const password = document.getElementById("login-password").value;
 
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-  const user = data?.user;
-
-  if (error || !user) {
+  if (error) {
     alert("Credenciales incorrectas ❌");
     console.error(error);
     return;
   }
-
-  alert("Bienvenido " + user.email + " ✅");
+  alert("Bienvenido " + data.user.email + " ✅");
   loginModal.style.display = "none";
   adminPanel.classList.remove("hidden");
   esAdmin = true;
   cargarTrabajos();
+});
+
+// 🆕 REGISTRO
+registerForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const email = document.getElementById("register-email").value;
+  const password = document.getElementById("register-password").value;
+
+  const { data, error } = await supabase.auth.signUp({ email, password });
+  if (error) {
+    alert("Error al registrar: " + error.message);
+    console.error(error);
+    return;
+  }
+  alert("Administrador registrado ✅ Revisa tu correo para confirmar.");
+  registerForm.reset();
 });
 
 // 🔒 CERRAR SESIÓN
@@ -60,40 +77,31 @@ logoutBtn.addEventListener("click", async () => {
   cargarTrabajos();
 });
 
-// Formularios y lista
-const uploadForm = document.getElementById("uploadForm");
-const trabajosList = document.getElementById("trabajosList");
-
-// 📂 SUBIR ARCHIVO A SUPABASE STORAGE
+// 📂 SUBIR ARCHIVO
 uploadForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  // 🔒 Verificar sesión antes de subir archivo
   const { data: sessionData } = await supabase.auth.getSession();
-  const user = sessionData?.session?.user;
-  if (!user) {
+  if (!sessionData?.session) {
     alert("Debes iniciar sesión antes de subir archivos ❌");
     return;
   }
 
-  const nombre = document.getElementById("nombre").value; // Nombre del trabajo
+  const titulo = document.getElementById("titulo").value;
   const curso = document.getElementById("cursoSelect").value;
   const archivoInput = document.getElementById("archivo");
 
   if (archivoInput.files.length > 0) {
     const archivo = archivoInput.files[0];
 
-    // 🔧 Limpiar nombre del archivo
+    // limpiar nombre
     let nombreLimpio = archivo.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    nombreLimpio = nombreLimpio.replace(/\s+/g, "_");
-    nombreLimpio = nombreLimpio.replace(/[^a-zA-Z0-9._-]/g, "");
-
+    nombreLimpio = nombreLimpio.replace(/\s+/g, "_").replace(/[^a-zA-Z0-9._-]/g, "");
     const nombreArchivo = Date.now() + "_" + nombreLimpio;
 
-    // Subir archivo al bucket "trabajos"
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from("trabajos")
-      .upload(nombreArchivo, archivo, { cacheControl: "3600", upsert: false });
+      .upload(nombreArchivo, archivo);
 
     if (uploadError) {
       alert("Error al subir archivo: " + uploadError.message);
@@ -101,14 +109,10 @@ uploadForm.addEventListener("submit", async (e) => {
       return;
     }
 
-    // Obtener URL pública
-    const { data: urlData } = supabase.storage
-      .from("trabajos")
-      .getPublicUrl(nombreArchivo);
+    const { data: urlData } = supabase.storage.from("trabajos").getPublicUrl(nombreArchivo);
 
-    // Guardar metadata en tabla "trabajos" SIN enviar fecha
     const { error: insertError } = await supabase.from("trabajos").insert([
-      { nombre, curso, archivo: urlData.publicUrl }
+      { titulo, curso, archivo: urlData.publicUrl }
     ]);
 
     if (insertError) {
@@ -123,10 +127,9 @@ uploadForm.addEventListener("submit", async (e) => {
   }
 });
 
-// 📥 CARGAR TRABAJOS DESDE SUPABASE
+// 📥 CARGAR TRABAJOS
 async function cargarTrabajos(curso = null) {
   const { data: trabajos, error } = await supabase.from("trabajos").select("*");
-
   if (error) {
     console.error("Error al cargar trabajos:", error);
     return;
@@ -140,22 +143,21 @@ async function cargarTrabajos(curso = null) {
     const card = document.createElement("div");
     card.classList.add("trabajo-card");
     card.innerHTML = `
-      <h3>${t.nombre}</h3>
+      <h3>${t.titulo}</h3>
       <p><strong>Curso:</strong> ${t.curso}</p>
-      <p><strong>Fecha:</strong> ${t.fecha}</p>
       <embed src="${t.archivo}" width="100%" height="150px" type="application/pdf"/>
       <a href="${t.archivo}" download>Descargar</a>
       <button onclick="window.open('${t.archivo}','_blank')">Ver</button>
-      ${esAdmin ? `<button onclick="eliminarTrabajo('${t.nombre}')">Eliminar</button>` : ""}
+      ${esAdmin ? `<button onclick="eliminarTrabajo(${t.id})">Eliminar</button>` : ""}
     `;
     trabajosList.appendChild(card);
   });
 }
 
 // 🗑️ ELIMINAR TRABAJO
-async function eliminarTrabajo(nombre) {
+async function eliminarTrabajo(id) {
   if (confirm("¿Seguro que deseas eliminar este trabajo?")) {
-    const { error } = await supabase.from("trabajos").delete().eq("nombre", nombre);
+    const { error } = await supabase.from("trabajos").delete().eq("id", id);
     if (error) {
       console.error("Error al eliminar:", error);
       alert("Error al eliminar el trabajo");
