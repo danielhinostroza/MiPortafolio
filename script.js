@@ -1,6 +1,6 @@
 // 🚀 Configuración de Supabase
 const SUPABASE_URL = "https://unmspywowybnleivempq.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVubXNweXdvd3libmxlaXZlbXBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxNTI0NzYsImV4cCI6MjA3MzcyODQ3Nn0.lVDA_rXPqnYbod8CQjZJJUHsuXs8mmJqzzSPIFfI-eU"; // ⚠️ pon aquí tu anon key real
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVubXNweXdvd3libmxlaXZlbXBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxNTI0NzYsImV4cCI6MjA3MzcyODQ3Nn0.lVDA_rXPqnYbod8CQjZJJUHsuXs8mmJqzzSPIFfI-eU";
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Modal login
@@ -77,55 +77,76 @@ logoutBtn.addEventListener("click", async () => {
   cargarTrabajos();
 });
 
-// 📂 SUBIR ARCHIVO
+
+// 📂 SUBIR ARCHIVO (MODIFICADO 🚨 para incluir user_id)
 uploadForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
+  // 1) Obtener usuario autenticado
   const { data: sessionData } = await supabase.auth.getSession();
-  if (!sessionData?.session) {
+  const user = sessionData?.session?.user;
+  if (!user) {
     alert("Debes iniciar sesión antes de subir archivos ❌");
     return;
   }
 
-  const titulo = document.getElementById("titulo").value;
+  // 2) Obtener campos
+  const titulo = document.getElementById("titulo").value.trim();
   const curso = document.getElementById("cursoSelect").value;
   const archivoInput = document.getElementById("archivo");
 
-  if (archivoInput.files.length > 0) {
-    const archivo = archivoInput.files[0];
-
-    // limpiar nombre
-    let nombreLimpio = archivo.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    nombreLimpio = nombreLimpio.replace(/\s+/g, "_").replace(/[^a-zA-Z0-9._-]/g, "");
-    const nombreArchivo = Date.now() + "_" + nombreLimpio;
-
-    const { error: uploadError } = await supabase.storage
-      .from("trabajos")
-      .upload(nombreArchivo, archivo);
-
-    if (uploadError) {
-      alert("Error al subir archivo: " + uploadError.message);
-      console.error(uploadError);
-      return;
-    }
-
-    const { data: urlData } = supabase.storage.from("trabajos").getPublicUrl(nombreArchivo);
-
-    const { error: insertError } = await supabase.from("trabajos").insert([
-      { titulo, curso, archivo: urlData.publicUrl }
-    ]);
-
-    if (insertError) {
-      alert("Error al guardar en base de datos: " + insertError.message);
-      console.error(insertError);
-      return;
-    }
-
-    alert("Trabajo subido con éxito ✅");
-    uploadForm.reset();
-    cargarTrabajos();
+  if (!titulo) {
+    alert("Escribe un título para el trabajo");
+    return;
   }
+  if (archivoInput.files.length === 0) {
+    alert("Selecciona un archivo");
+    return;
+  }
+
+  const archivo = archivoInput.files[0];
+
+  // 3) Limpiar nombre y hacerlo único
+  let nombreLimpio = archivo.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  nombreLimpio = nombreLimpio.replace(/\s+/g, "_").replace(/[^a-zA-Z0-9._-]/g, "");
+  const nombreArchivo = Date.now() + "_" + nombreLimpio;
+
+  // 4) Subir a bucket "trabajos"
+  const { error: uploadError } = await supabase.storage
+    .from("trabajos")
+    .upload(nombreArchivo, archivo);
+
+  if (uploadError) {
+    alert("Error al subir archivo: " + uploadError.message);
+    console.error(uploadError);
+    return;
+  }
+
+  // 5) Obtener URL pública
+  const { data: urlData } = supabase.storage.from("trabajos").getPublicUrl(nombreArchivo);
+  const publicUrl = urlData?.publicUrl || nombreArchivo;
+
+  // 6) Insertar en la tabla incluyendo user_id 🔑
+  const { error: insertError } = await supabase.from("trabajos").insert([
+    {
+      nombre: titulo,
+      curso: curso,
+      archivo: publicUrl,
+      user_id: user.id, // 👈 aquí la magia
+    },
+  ]);
+
+  if (insertError) {
+    alert("Error al guardar en base de datos: " + insertError.message);
+    console.error(insertError);
+    return;
+  }
+
+  alert("Trabajo subido con éxito ✅");
+  uploadForm.reset();
+  cargarTrabajos();
 });
+
 
 // 📥 CARGAR TRABAJOS
 async function cargarTrabajos(curso = null) {
@@ -143,7 +164,7 @@ async function cargarTrabajos(curso = null) {
     const card = document.createElement("div");
     card.classList.add("trabajo-card");
     card.innerHTML = `
-      <h3>${t.titulo}</h3>
+      <h3>${t.nombre}</h3>
       <p><strong>Curso:</strong> ${t.curso}</p>
       <embed src="${t.archivo}" width="100%" height="150px" type="application/pdf"/>
       <a href="${t.archivo}" download>Descargar</a>
@@ -160,7 +181,7 @@ async function eliminarTrabajo(id) {
     const { error } = await supabase.from("trabajos").delete().eq("id", id);
     if (error) {
       console.error("Error al eliminar:", error);
-      alert("Error al eliminar el trabajo");
+      alert("Error al eliminar el trabajo ❌");
       return;
     }
     cargarTrabajos();
