@@ -1,7 +1,7 @@
-// 🚀 Inicializar Supabase
-const supabase = window.supabase.createClient(
+// 🚀 Inicializar Supabase (CORRECTO)
+const supabase = supabase.createClient(
   "https://fbyjhfzzkkwzvscxuqrf.supabase.co", // tu URL del proyecto
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVubXNweXdvd3libmxlaXZlbXBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxNTI0NzYsImV4cCI6MjA3MzcyODQ3Nn0.lVDA_rXPqnYbod8CQjZJJUHsuXs8mmJqzzSPIFfI-eU" // ⚠️ pega la anon key actualizada desde Project Settings > API
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZieWpoZnp6a2t3enZzY3h1cXJmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxNTI0NzYsImV4cCI6MjA3MzcyODQ3Nn0.lVDA_rXPqnYbod8CQjZJJUHsuXs8mmJqzzSPIFfI-eU" 
 );
 
 // === ELEMENTOS ===
