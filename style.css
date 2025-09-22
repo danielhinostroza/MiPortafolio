@@ -211,3 +211,57 @@ header {
   font-size: 24px;
   margin: 0;
 }
+
+
+
+./* ... tus estilos anteriores (header, logo, etc.) ... */
+.cartilla {
+  position: fixed;       /* fijo en pantalla */
+  top: 0;                /* pegado arriba */
+  right: 0;              /* pegado al costado derecho */
+  width: 340px;
+  height: 100vh;         /* ocupa toda la altura de la ventana */
+  background: rgba(20, 20, 20, 0.95);
+  color: #fff;
+  box-shadow: -4px 0 15px rgba(0,0,0,0.6);
+  padding: 25px;
+  transform: translateX(100%);   /* escondida a la derecha */
+  transition: transform 0.4s ease-in-out;
+  z-index: 9999;         /* encima de todo */
+}
+
+.cartilla.show {
+  transform: translateX(0); /* aparece deslizándose */
+}
+
+.hidden {
+  display: none;
+}
+
+.cartilla-content {
+  margin-top: 60px;
+  text-align: center;
+}
+
+.cartilla-foto {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  margin-bottom: 15px;
+  border: 3px solid #6c5ce7;
+  box-shadow: 0 0 15px rgba(108, 92, 231, 0.8);
+}
+
+.cerrar-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: #e74c3c;
+  border: none;
+  color: #fff;
+  font-weight: bold;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+}

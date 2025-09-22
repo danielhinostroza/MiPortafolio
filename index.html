@@ -14,27 +14,13 @@
   </div>
   <nav>
       <ul>
-        <li><a href="#about">Sobre mí</a></li>
+        <li><a href="#" id="sobreMiBtn">Sobre mí</a></li>
         <li><a href="#cursos">Cursos</a></li>
         <li><a href="#proyectos">Proyectos</a></li>
         <li><button id="adminBtn" type="button">Administrador</button></li>
       </ul>
     </nav>
   </header>
-
-
-
-<!-- Nueva cartilla lateral -->
-<div id="sobreMiCartilla" class="cartilla hidden">
-  <div class="cartilla-content">
-    <button id="cerrarCartilla" class="cerrar-btn">X</button>
-    <img src="imagenes/foto_mia.jpg" alt="Mi foto" class="cartilla-foto"/>
-    <h2>Luis Daniel Hinostroza Canchumanya</h2>
-    <p><strong>Celular:</strong> 956698819</p>
-    <p><strong>Ciudad:</strong> Huancayo, Perú</p>
-    <p><strong>Me gusta:</strong> el desarrollo de software, diseño de sistemas y soluciones tecnológicas.</p>
-  </div>
-</div>
 
 
 
@@ -46,7 +32,17 @@
       <h1>Hola, soy Ingeniero de Sistemas</h1>
       <p>Me especializo en desarrollo de software, diseño de sistemas y soluciones tecnológicas. Aquí comparto mis proyectos y trabajos organizados por curso.</p>
     </section>
-
+<!-- Cartilla lateral -->
+<div id="sobreMiCartilla" class="cartilla hidden">
+  <button id="cerrarCartilla" class="cerrar-btn">X</button>
+  <div class="cartilla-content">
+    <img src="imagenes/foto_mia.jpg" alt="Mi foto" class="cartilla-foto"/>
+    <h2>Luis Daniel Hinostroza Canchumanya</h2>
+    <p><strong>Celular:</strong> 956698819</p>
+    <p><strong>Ciudad:</strong> Huancayo, Perú</p>
+    <p><strong>Me gusta:</strong> el desarrollo de software, diseño de sistemas y soluciones tecnológicas.</p>
+  </div>
+</div>
     <!-- Cursos -->
     <section id="cursos" class="cursos-section">
       <h2>Categorías de Cursos</h2>
@@ -90,15 +86,7 @@
         <input type="password" id="login-password" placeholder="********" required>
         <button type="submit" class="btn-login">Entrar</button>
       </form>
-      <hr>
-      <form id="registerForm">
-        <h3>Registrar nuevo admin</h3>
-        <label for="register-email">Correo</label>
-        <input type="email" id="register-email" placeholder="nuevo@portafolio.com" required>
-        <label for="register-password">Contraseña</label>
-        <input type="password" id="register-password" placeholder="********" required>
-        <button type="submit" class="btn-register">Registrar</button>
-      </form>
+      
     </div>
   </div>
 
@@ -126,6 +114,10 @@
   <!-- 🚀 Importar Supabase -->
   <script src="https://unpkg.com/@supabase/supabase-js"></script>
   <script src="script.js"></script>
+
+
+
+
+
 </body>
 </html>
-

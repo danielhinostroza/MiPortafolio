@@ -52,21 +52,7 @@ loginForm.addEventListener("submit", async (e) => {
   cargarTrabajos();
 });
 
-// 🆕 REGISTRO
-registerForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const email = document.getElementById("register-email").value;
-  const password = document.getElementById("register-password").value;
 
-  const { data, error } = await supabase.auth.signUp({ email, password });
-  if (error) {
-    alert("Error al registrar: " + error.message);
-    console.error(error);
-    return;
-  }
-  alert("Administrador registrado ✅ Revisa tu correo para confirmar.");
-  registerForm.reset();
-});
 
 // 🔒 CERRAR SESIÓN
 logoutBtn.addEventListener("click", async () => {
@@ -198,3 +184,28 @@ document.querySelectorAll(".curso-card").forEach(card => {
 
 // Mostrar todos al inicio
 cargarTrabajos();
+
+
+// Cartilla "Sobre mí"
+document.addEventListener("DOMContentLoaded", () => {
+  const sobreMiBtn = document.getElementById("sobreMiBtn");
+  const sobreMiCartilla = document.getElementById("sobreMiCartilla");
+  const cerrarCartilla = document.getElementById("cerrarCartilla");
+
+  if (sobreMiBtn && sobreMiCartilla && cerrarCartilla) {
+    sobreMiBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      sobreMiCartilla.classList.remove("hidden");
+      sobreMiCartilla.classList.add("show");
+    });
+
+    cerrarCartilla.addEventListener("click", () => {
+      sobreMiCartilla.classList.remove("show");
+      setTimeout(() => {
+        sobreMiCartilla.classList.add("hidden");
+      }, 400);
+    });
+  } else {
+    console.error("⚠️ No se encontró alguno de los elementos (sobreMiBtn, sobreMiCartilla o cerrarCartilla). Revisa los IDs en tu HTML.");
+  }
+});
