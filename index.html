@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
@@ -8,10 +8,12 @@
 </head>
 <body>
   <header>
+    <!-- Logo UPLA -->
+    <img src="imagenes/logo-upla.png" alt="Logo UPLA" class="logo-upla"/>
     <div class="logo">🎓 Mi Portafolio</div>
     <nav>
       <ul>
-        <li><a href="#about">Sobre mí</a></li>
+        <li><a href="#about" id="aboutBtn">Sobre mí</a></li>
         <li><a href="#cursos">Cursos</a></li>
         <li><a href="#proyectos">Proyectos</a></li>
         <li><button id="adminBtn" type="button">Administrador</button></li>
@@ -79,6 +81,21 @@
         <input type="password" id="register-password" placeholder="********" required>
         <button type="submit" class="btn-register">Registrar</button>
       </form>
+    </div>
+  </div>
+
+  <!-- Modal Sobre mí -->
+  <div id="aboutModal" class="modal">
+    <div class="modal-content">
+      <span class="closeAbout">&times;</span>
+      <h2>Sobre mí</h2>
+      <img src="imagenes/WhatsApp Image 2025-09-14 at 10.53.54 AM.jpeg" alt="Foto personal" class="profile-pic"/>
+      <p><strong>Nombre completo:</strong> LUIS DANIEL HINOSTROZA CANCHUMANYA</p>
+      <p><strong>Ciudad:</strong> Huancayo</p>
+      <p><strong>Universidad:</strong> Universidad Peruana Los Andes</p>
+      <a href="https://wa.me/51999999999" target="_blank">
+        <button class="btn-whatsapp">📱 Contactar por WhatsApp</button>
+      </a>
     </div>
   </div>
 
