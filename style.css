@@ -197,8 +197,10 @@ header {
 
 /* Logo UPLA */
 .logo img {
-  width: 5px;
-  height: auto;
+  width: 25px !important;   /* tamaño bien pequeño */
+  height: auto !important;
+  display: block;
+  object-fit: contain;
 }
 
 /* Título centrado */
