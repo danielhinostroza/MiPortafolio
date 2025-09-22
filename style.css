@@ -183,3 +183,29 @@ button:hover {
   background: #e74c3c;
   margin-bottom: 15px;
 }
+
+
+
+/* Header */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 40px;
+  background: rgba(0,0,0,0.6);
+}
+
+/* Logo UPLA */
+.logo img {
+  width: 45px;
+  height: auto;
+}
+
+/* Título centrado */
+.titulo-portafolio {
+  flex: 1;
+  text-align: center;
+  color: white;
+  font-size: 24px;
+  margin: 0;
+}
