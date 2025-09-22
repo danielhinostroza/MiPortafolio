@@ -183,29 +183,3 @@ button:hover {
   margin-bottom: 15px;
 }
 
-/* Logo UPLA */
-.upla-logo {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-}
-.upla-logo img {
-  width: 1px;
-  height: auto;
-}
-
-/* Modal Sobre Mí */
-#sobreMiModal .modal-content {
-  text-align: center;
-}
-#sobreMiModal h2 {
-  margin-top: 15px;
-  font-size: 20px;
-}
-#whatsappBtn button {
-  background: #25d366;
-  color: white;
-  font-weight: bold;
-  margin-top: 15px;
-  border-radius: 8px;
-}

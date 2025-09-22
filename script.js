@@ -200,11 +200,3 @@ document.querySelectorAll(".curso-card").forEach(card => {
 cargarTrabajos();
 
 
-// 📌 Modal Sobre Mí
-const sobreMiBtn = document.getElementById("sobreMiBtn");
-const sobreMiModal = document.getElementById("sobreMiModal");
-const closeSobreMi = document.querySelector(".closeSobreMi");
-
-sobreMiBtn.onclick = () => sobreMiModal.style.display = "block";
-closeSobreMi.onclick = () => sobreMiModal.style.display = "none";
-window.onclick = (e) => { if (e.target === sobreMiModal) sobreMiModal.style.display = "none"; };
