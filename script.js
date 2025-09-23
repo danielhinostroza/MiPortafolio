@@ -149,7 +149,7 @@ uploadForm.addEventListener("submit", async (e) => {
     nombre: titulo,
     curso: curso,
     archivo: publicUrl,
-    user_id: user.id  // es string (uuid) normalmente
+    user_id: user.id  // ✅ se mantiene correcto (uuid)
   };
 
   console.log("Insertando en trabajos:", nuevoRegistro);
@@ -158,7 +158,6 @@ uploadForm.addEventListener("submit", async (e) => {
     const { data: insertData, error: insertError } = await supabase.from("trabajos").insert([nuevoRegistro]);
 
     if (insertError) {
-      // NO BORRAR NADA: solo informar y dejar archivo en storage (según tu requisito)
       alert("Error al guardar en base de datos: " + insertError.message);
       console.error("Insert error:", insertError);
       return;
@@ -198,7 +197,7 @@ async function cargarTrabajos(curso = null) {
         <embed src="${t.archivo}" width="100%" height="150px" type="application/pdf"/>
         <a href="${t.archivo}" download>Descargar</a>
         <button onclick="window.open('${t.archivo}','_blank')">Ver</button>
-        ${esAdmin ? `<button onclick="eliminarTrabajo(${t.id})">Eliminar</button>` : ""}
+        ${esAdmin ? `<button onclick="eliminarTrabajo('${t.id}')">Eliminar</button>` : ""}
       `;
       trabajosList.appendChild(card);
     });
