@@ -1,146 +1,260 @@
-// --- CONFIGURACIÓN SUPABASE ---
+// 🚀 Configuración de Supabase
 const SUPABASE_URL = "https://unmspywowybnleivempq.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVubXNweXdvd3libmxlaXZlbXBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxNTI0NzYsImV4cCI6MjA3MzcyODQ3Nn0.lVDA_rXPqnYbod8CQjZJJUHsuXs8mmJqzzSPIFfI-eU";
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// --- FUNCIONES DE UI ---
-function mostrarSeccion(id) {
-  document.querySelectorAll('.seccion').forEach(sec => sec.style.display = "none");
-  document.getElementById(id).style.display = "block";
-}
-
-// Abrir panel de una semana
-async function abrirSemana(semana) {
-  document.getElementById("mainView").style.display = "none";
-  document.getElementById("semanaPanel").style.display = "block";
-
-  document.getElementById("tituloSemana").textContent = "📂 " + semana.toUpperCase();
-  await mostrarArchivos(semana);
-  document.getElementById("semanaPanel").setAttribute("data-semana", semana);
-}
-
-// Volver al menú principal
-function volverMain() {
-  document.getElementById("semanaPanel").style.display = "none";
-  document.getElementById("mainView").style.display = "block";
-}
-
-// Mostrar archivos en panel de semana
-async function mostrarArchivos(semana) {
-  const cont = document.getElementById("archivosSemana");
-  cont.innerHTML = "<p>Cargando archivos...</p>";
-
-  let { data, error } = await supabase
-    .from("archivos")
-    .select("*")
-    .eq("semana", semana)
-    .order("fecha", { ascending: false });
-
-  if (error) {
-    cont.innerHTML = `<p style="color:red;">Error cargando archivos</p>`;
-    console.error(error);
-    return;
-  }
-
-  cont.innerHTML = "";
-  data.forEach(fileObj => {
-    const fileDiv = document.createElement("div");
-    fileDiv.classList.add("archivo");
-    fileDiv.innerHTML = `
-      <p><strong>${fileObj.nombre}</strong></p>
-      <p>📅 ${new Date(fileObj.fecha).toLocaleString()}</p>
-      <button onclick="verArchivo('${fileObj.url}')">Ver</button>
-    `;
-    cont.appendChild(fileDiv);
-  });
-}
-
-// Modal para vista previa
-function verArchivo(url) {
-  document.getElementById("modal").style.display = "flex";
-  document.getElementById("vistaArchivo").src = url;
-}
-
-function cerrarModal() {
-  document.getElementById("modal").style.display = "none";
-  document.getElementById("vistaArchivo").src = "";
-}
-
-// --- LOGIN ---
+// Modal login
+const adminBtn = document.getElementById("adminBtn");
 const loginModal = document.getElementById("loginModal");
-function abrirLogin() {
-  loginModal.style.display = "flex";
-}
-function cerrarLogin() {
-  loginModal.style.display = "none";
-}
-
+const closeBtn = document.querySelector(".closeBtn");
 const loginForm = document.getElementById("loginForm");
-const loginMessage = document.getElementById("loginMessage");
 const adminPanel = document.getElementById("adminPanel");
+const logoutBtn = document.getElementById("logoutBtn");
 
-loginForm.addEventListener("submit", (e) => {
+// Formularios y lista
+const uploadForm = document.getElementById("uploadForm");
+const trabajosList = document.getElementById("trabajosList");
+
+let esAdmin = false;
+
+// Abrir/Cerrar modal
+adminBtn.onclick = () => loginModal.style.display = "block";
+closeBtn.onclick = () => loginModal.style.display = "none";
+window.onclick = (e) => { if (e.target === loginModal) loginModal.style.display = "none"; };
+
+// Recuperar sesión al cargar la página
+(async () => {
+  try {
+    const { data } = await supabase.auth.getSession();
+    const user = data?.session?.user;
+    console.log("Session on load:", user);
+    if (user) {
+      esAdmin = true;
+      adminPanel.classList.remove("hidden");
+      cargarTrabajos();
+    } else {
+      esAdmin = false;
+      adminPanel.classList.add("hidden");
+      cargarTrabajos();
+    }
+  } catch (err) {
+    console.error("Error getSession inicial:", err);
+    cargarTrabajos();
+  }
+})();
+
+// LOGIN
+loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const user = document.getElementById("username").value;
-  const pass = document.getElementById("password").value;
+  const email = document.getElementById("login-email").value;
+  const password = document.getElementById("login-password").value;
 
-  if (user === "admin" && pass === "1234") {
-    loginMessage.textContent = "✅ Login exitoso";
-    loginMessage.style.color = "green";
-    cerrarLogin();
-    adminPanel.style.display = "block";
-  } else {
-    loginMessage.textContent = "❌ Usuario o contraseña incorrectos";
-    loginMessage.style.color = "red";
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      alert("Credenciales incorrectas ❌");
+      console.error("login error:", error);
+      return;
+    }
+    alert("Bienvenido " + data.user.email + " ✅");
+    loginModal.style.display = "none";
+    adminPanel.classList.remove("hidden");
+    esAdmin = true;
+    cargarTrabajos();
+  } catch (err) {
+    console.error("Error en login:", err);
+    alert("Error al iniciar sesión");
   }
 });
 
-// --- SUBIDA DE ARCHIVOS A SUPABASE ---
-const uploadForm = document.getElementById("uploadForm");
+// CERRAR SESIÓN
+logoutBtn.addEventListener("click", async () => {
+  try {
+    await supabase.auth.signOut();
+    adminPanel.classList.add("hidden");
+    alert("Sesión cerrada");
+    esAdmin = false;
+    cargarTrabajos();
+  } catch (err) {
+    console.error("Error al cerrar sesión:", err);
+  }
+});
+
+// SUBIR ARCHIVO (con user_id)
 uploadForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const fileInput = document.getElementById("fileInput");
-  const semana = document.getElementById("semanaSelect").value;
-  const file = fileInput.files[0];
-
-  if (!file) return;
-
-  const filePath = `${semana}/${Date.now()}_${file.name}`;
-
-  // Subir a Supabase Storage
-  let { error: uploadError } = await supabase.storage
-    .from("archivos") // 👈 nombre del bucket
-    .upload(filePath, file);
-
-  if (uploadError) {
-    alert("❌ Error al subir archivo");
-    console.error(uploadError);
+  // 1) Obtener usuario autenticado
+  const { data: sessionData } = await supabase.auth.getSession();
+  const user = sessionData?.session?.user;
+  console.log("Sesion upload - user:", user);
+  if (!user) {
+    alert("Debes iniciar sesión antes de subir archivos ❌");
     return;
   }
 
-  // Obtener URL pública
-  const { data: publicUrl } = supabase.storage
-    .from("archivos")
-    .getPublicUrl(filePath);
+  // 2) Obtener campos
+  const titulo = document.getElementById("titulo").value.trim();
+  const curso = document.getElementById("cursoSelect").value;
+  const archivoInput = document.getElementById("archivo");
 
-  // Guardar en tabla
-  let { error: insertError } = await supabase
-    .from("archivos")
-    .insert([{
-      nombre: file.name,
-      semana: semana,
-      fecha: new Date().toISOString(),
-      url: publicUrl.publicUrl
-    }]);
-
-  if (insertError) {
-    alert("❌ Error al registrar archivo");
-    console.error(insertError);
+  if (!titulo) {
+    alert("Escribe un título para el trabajo");
+    return;
+  }
+  if (archivoInput.files.length === 0) {
+    alert("Selecciona un archivo");
     return;
   }
 
-  fileInput.value = "";
-  alert("✅ Archivo subido a " + semana);
-  await mostrarArchivos(semana);
+  const archivo = archivoInput.files[0];
+
+  // 3) Limpiar nombre y hacerlo único
+  let nombreLimpio = archivo.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  nombreLimpio = nombreLimpio.replace(/\s+/g, "_").replace(/[^a-zA-Z0-9._-]/g, "");
+  const nombreArchivo = Date.now() + "_" + nombreLimpio;
+
+  // 4) Subir a bucket "trabajos"
+  try {
+    const { error: uploadError } = await supabase.storage
+      .from("trabajos")
+      .upload(nombreArchivo, archivo);
+
+    if (uploadError) {
+      alert("Error al subir archivo: " + uploadError.message);
+      console.error("uploadError:", uploadError);
+      return;
+    }
+  } catch (err) {
+    console.error("Excepción upload storage:", err);
+    alert("Error al subir el archivo (storage)");
+    return;
+  }
+
+  // 5) Obtener URL pública
+  let publicUrl = nombreArchivo;
+  try {
+    const { data: urlData, error: urlErr } = await supabase.storage.from("trabajos").getPublicUrl(nombreArchivo);
+    if (urlErr) {
+      console.warn("getPublicUrl error:", urlErr);
+    } else {
+      publicUrl = urlData?.publicUrl || nombreArchivo;
+    }
+  } catch (err) {
+    console.warn("Excepción getPublicUrl:", err);
+  }
+
+  // 6) Insertar en la tabla incluyendo user_id
+  const nuevoRegistro = {
+    nombre: titulo,
+    curso: curso,
+    archivo: publicUrl,
+    user_id: user.id  // ✅ se mantiene correcto (uuid)
+  };
+
+  console.log("Insertando en trabajos:", nuevoRegistro);
+
+  try {
+    const { data: insertData, error: insertError } = await supabase.from("trabajos").insert([nuevoRegistro]);
+
+    if (insertError) {
+      alert("Error al guardar en base de datos: " + insertError.message);
+      console.error("Insert error:", insertError);
+      return;
+    }
+
+    console.log("Insert success:", insertData);
+    alert("Trabajo subido con éxito ✅");
+    uploadForm.reset();
+    cargarTrabajos();
+
+  } catch (err) {
+    console.error("Excepción insert:", err);
+    alert("Error inesperado al guardar en la base de datos");
+  }
+});
+
+// CARGAR TRABAJOS
+async function cargarTrabajos(curso = null) {
+  try {
+    const { data: trabajos, error } = await supabase.from("trabajos").select("*");
+    if (error) {
+      console.error("Error al cargar trabajos:", error);
+      trabajosList.innerHTML = "<p>Error al cargar trabajos</p>";
+      return;
+    }
+
+    let lista = trabajos || [];
+    if (curso) lista = lista.filter(t => t.curso === curso);
+
+    trabajosList.innerHTML = "";
+    lista.forEach((t) => {
+      const card = document.createElement("div");
+      card.classList.add("trabajo-card");
+      card.innerHTML = `
+        <h3>${t.nombre}</h3>
+        <p><strong>Curso:</strong> ${t.curso}</p>
+        <embed src="${t.archivo}" width="100%" height="150px" type="application/pdf"/>
+        <a href="${t.archivo}" download>Descargar</a>
+        <button onclick="window.open('${t.archivo}','_blank')">Ver</button>
+        ${esAdmin ? `<button onclick="eliminarTrabajo('${t.id}')">Eliminar</button>` : ""}
+      `;
+      trabajosList.appendChild(card);
+    });
+  } catch (err) {
+    console.error("Excepción cargarTrabajos:", err);
+    trabajosList.innerHTML = "<p>Error al cargar trabajos (excepción)</p>";
+  }
+}
+
+// ELIMINAR TRABAJO
+async function eliminarTrabajo(id) {
+  if (!confirm("¿Seguro que deseas eliminar este trabajo?")) return;
+  try {
+    const { error } = await supabase.from("trabajos").delete().eq("id", id);
+    if (error) {
+      console.error("Error al eliminar:", error);
+      alert("Error al eliminar el trabajo ❌");
+      return;
+    }
+    cargarTrabajos();
+  } catch (err) {
+    console.error("Excepción eliminarTrabajo:", err);
+    alert("Error al eliminar (excepción)");
+  }
+}
+
+// FILTRO POR CURSO
+document.querySelectorAll(".curso-card").forEach(card => {
+  card.addEventListener("click", () => {
+    const curso = card.dataset.curso;
+    cargarTrabajos(curso);
+  });
+});
+
+// Mostrar todos al inicio
+cargarTrabajos();
+
+// Cartilla "Sobre mí" (mantengo igual)
+document.addEventListener("DOMContentLoaded", () => {
+  const sobreMiBtn = document.getElementById("sobreMiBtn");
+  const sobreMiCartilla = document.getElementById("sobreMiCartilla");
+  const cerrarCartilla = document.getElementById("cerrarCartilla");
+
+  if (sobreMiBtn && sobreMiCartilla && cerrarCartilla) {
+    sobreMiBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      sobreMiCartilla.classList.remove("hidden");
+      sobreMiCartilla.classList.add("show");
+    });
+
+    cerrarCartilla.addEventListener("click", () => {
+      sobreMiCartilla.classList.remove("show");
+      setTimeout(() => {
+        sobreMiCartilla.classList.add("hidden");
+      }, 400);
+    });
+  } else {
+    console.error("⚠️ No se encontró alguno de los elementos (sobreMiBtn, sobreMiCartilla o cerrarCartilla). Revisa los IDs en tu HTML.");
+  }
 });
