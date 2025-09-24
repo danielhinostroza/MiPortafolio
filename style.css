@@ -1,146 +1,78 @@
 body {
   font-family: Arial, sans-serif;
   margin: 0;
-  background: #f4f6f8;
+  padding: 0;
+  background: #f4f4f4;
 }
 
-/* Header */
 header {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  background: #2c3e50;
-  padding: 10px 20px;
+  align-items: center;
+  background: #222;
   color: white;
+  padding: 10px 20px;
+}
+
+header .perfil {
+  display: flex;
+  align-items: center;
 }
 
 header .perfil img {
-  width: 60px;
-  height: 60px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
-  border: 2px solid white;
+  margin-right: 10px;
 }
 
-header nav button {
-  margin-left: 10px;
-  padding: 8px 15px;
-  border: none;
-  border-radius: 6px;
-  background: #3498db;
-  color: white;
-  cursor: pointer;
-}
-
-header nav button:hover {
-  background: #2980b9;
-}
-
-/* Secciones */
-.seccion {
-  padding: 20px;
-}
-
-/* Vista principal */
-.semana {
-  background: #3498db;
-  color: white;
-  margin: 10px;
-  padding: 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  text-align: center;
-}
-
-/* Archivos */
-.archivo {
-  background: white;
-  padding: 10px;
-  margin: 10px 0;
-  border-radius: 6px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.archivo button {
+nav button {
+  margin: 0 5px;
   padding: 6px 12px;
   border: none;
-  border-radius: 5px;
-  background: #3498db;
+  background: #444;
   color: white;
   cursor: pointer;
 }
-
-.archivo button:hover {
-  background: #2980b9;
+nav button:hover {
+  background: #666;
 }
 
-/* Modal general */
+.contenedor-semanas {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin: 30px 0;
+}
+
+.semana {
+  padding: 20px;
+  background: white;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+.semana:hover {
+  background: #eee;
+}
+
 .modal {
-  display: none;
   position: fixed;
   top: 0; left: 0;
   width: 100%; height: 100%;
-  background: rgba(0,0,0,0.7);
+  display: none;
   justify-content: center;
   align-items: center;
+  background: rgba(0,0,0,0.7);
 }
 
-/* Modal de login */
-.login-box {
-  background: #fff;
-  padding: 30px;
-  border-radius: 10px;
-  width: 350px;
-  text-align: center;
-}
-
-.login-box h2 {
-  margin-bottom: 15px;
-  color: #2c3e50;
-}
-
-.login-box input {
-  width: 90%;
-  padding: 10px;
-  margin: 8px 0;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-}
-
-.login-box button {
-  width: 100%;
-  padding: 10px;
-  margin-top: 10px;
-  border: none;
-  border-radius: 6px;
-  background: #3498db;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-.login-box button:hover {
-  background: #2980b9;
-}
-
-/* Modal de archivos */
 .modal-content {
   background: white;
-  padding: 15px;
-  border-radius: 8px;
-  width: 80%;
-  height: 80%;
-  position: relative;
+  padding: 20px;
+  border-radius: 10px;
 }
 
-.modal-content iframe {
-  width: 100%;
-  height: 90%;
-}
-
-.close {
-  position: absolute;
-  top: 10px; right: 20px;
-  font-size: 24px;
-  cursor: pointer;
+#vistaArchivo {
+  width: 600px;
+  height: 400px;
 }
