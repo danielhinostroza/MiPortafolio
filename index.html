@@ -3,48 +3,79 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Portafolio - UPLA</title>
+  <title>Portafolio</title>
   <link rel="stylesheet" href="style.css">
+  <!-- SDK de Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+  <!-- Header -->
   <header>
-    <h1>🎓 Portafolio de Ingeniería de Sistemas</h1>
-    <button id="adminBtn">Administrador</button>
+    <div class="perfil">
+      <img src="tu-foto.jpg" alt="Foto de perfil">
+    </div>
+    <nav>
+      <button onclick="mostrarSeccion('sobreMi')">Sobre mí</button>
+      <button onclick="abrirLogin()">Admin</button>
+    </nav>
   </header>
 
-  <main>
-    <section id="trabajos">
-      <h2>Mis Trabajos</h2>
-      <div id="trabajosList"></div>
-    </section>
-  </main>
+  <!-- Sección Sobre mí -->
+  <section id="sobreMi" class="seccion">
+    <h2>Sobre mí</h2>
+    <p>Aquí puedes poner tu descripción personal.</p>
+  </section>
 
-  <!-- Modal Login -->
+  <!-- Modal de Login -->
   <div id="loginModal" class="modal">
-    <div class="modal-content">
-      <span onclick="cerrarLogin()" class="close">&times;</span>
+    <div class="modal-content login-box">
+      <span class="close" onclick="cerrarLogin()">&times;</span>
       <h2>Login Administrador</h2>
       <form id="loginForm">
-        <input type="email" id="username" placeholder="Correo electrónico" required>
+        <input type="text" id="username" placeholder="Usuario" required>
         <input type="password" id="password" placeholder="Contraseña" required>
-        <button type="submit">Ingresar</button>
+        <button type="submit">Entrar</button>
       </form>
       <p id="loginMessage"></p>
     </div>
   </div>
 
-  <!-- Panel Admin -->
-  <section id="adminPanel" style="display: none;">
+  <!-- Panel de administración -->
+  <section id="adminPanel" class="seccion" style="display:none;">
     <h2>Panel de Administrador</h2>
     <form id="uploadForm">
+      <select id="semanaSelect">
+        <option value="semana1">Semana 1</option>
+        <option value="semana2">Semana 2</option>
+        <option value="semana3">Semana 3</option>
+      </select>
       <input type="file" id="fileInput" required>
-      <input type="text" id="titulo" placeholder="Título del trabajo" required>
-      <button type="submit">Subir Archivo</button>
+      <button type="submit">Subir archivo</button>
     </form>
-    <p id="uploadMessage"></p>
   </section>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-  <script src="script.js"></script>
+  <!-- Vista principal de semanas -->
+  <main id="mainView">
+    <div class="semana" onclick="abrirSemana('semana1')">📂 Semana 1</div>
+    <div class="semana" onclick="abrirSemana('semana2')">📂 Semana 2</div>
+    <div class="semana" onclick="abrirSemana('semana3')">📂 Semana 3</div>
+  </main>
+
+  <!-- Panel de semana individual -->
+  <section id="semanaPanel" class="seccion" style="display:none;">
+    <button onclick="volverMain()">⬅ Volver</button>
+    <h2 id="tituloSemana"></h2>
+    <div id="archivosSemana"></div>
+  </section>
+
+  <!-- Modal para vista previa -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="cerrarModal()">&times;</span>
+      <iframe id="vistaArchivo"></iframe>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
 </body>
 </html>

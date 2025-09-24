@@ -1,16 +1,73 @@
-// Conexión Supabase
+// --- CONFIGURACIÓN SUPABASE ---
 const SUPABASE_URL = "https://unmspywowybnleivempq.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVubXNweXdvd3libmxlaXZlbXBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxNTI0NzYsImV4cCI6MjA3MzcyODQ3Nn0.lVDA_rXPqnYbod8CQjZJJUHsuXs8mmJqzzSPIFfI-eU";
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// Botón admin
-document.getElementById("adminBtn").addEventListener("click", abrirLogin);
+// --- FUNCIONES DE UI ---
+function mostrarSeccion(id) {
+  document.querySelectorAll('.seccion').forEach(sec => sec.style.display = "none");
+  document.getElementById(id).style.display = "block";
+}
 
+// Abrir panel de una semana
+async function abrirSemana(semana) {
+  document.getElementById("mainView").style.display = "none";
+  document.getElementById("semanaPanel").style.display = "block";
+
+  document.getElementById("tituloSemana").textContent = "📂 " + semana.toUpperCase();
+  await mostrarArchivos(semana);
+  document.getElementById("semanaPanel").setAttribute("data-semana", semana);
+}
+
+// Volver al menú principal
+function volverMain() {
+  document.getElementById("semanaPanel").style.display = "none";
+  document.getElementById("mainView").style.display = "block";
+}
+
+// Mostrar archivos en panel de semana
+async function mostrarArchivos(semana) {
+  const cont = document.getElementById("archivosSemana");
+  cont.innerHTML = "<p>Cargando archivos...</p>";
+
+  let { data, error } = await supabase
+    .from("archivos")
+    .select("*")
+    .eq("semana", semana)
+    .order("fecha", { ascending: false });
+
+  if (error) {
+    cont.innerHTML = `<p style="color:red;">Error cargando archivos</p>`;
+    console.error(error);
+    return;
+  }
+
+  cont.innerHTML = "";
+  data.forEach(fileObj => {
+    const fileDiv = document.createElement("div");
+    fileDiv.classList.add("archivo");
+    fileDiv.innerHTML = `
+      <p><strong>${fileObj.nombre}</strong></p>
+      <p>📅 ${new Date(fileObj.fecha).toLocaleString()}</p>
+      <button onclick="verArchivo('${fileObj.url}')">Ver</button>
+    `;
+    cont.appendChild(fileDiv);
+  });
+}
+
+// Modal para vista previa
+function verArchivo(url) {
+  document.getElementById("modal").style.display = "flex";
+  document.getElementById("vistaArchivo").src = url;
+}
+
+function cerrarModal() {
+  document.getElementById("modal").style.display = "none";
+  document.getElementById("vistaArchivo").src = "";
+}
+
+// --- LOGIN ---
 const loginModal = document.getElementById("loginModal");
-const loginForm = document.getElementById("loginForm");
-const loginMessage = document.getElementById("loginMessage");
-const adminPanel = document.getElementById("adminPanel");
-
 function abrirLogin() {
   loginModal.style.display = "flex";
 }
@@ -18,86 +75,72 @@ function cerrarLogin() {
   loginModal.style.display = "none";
 }
 
-// Login
-loginForm.addEventListener("submit", async (e) => {
+const loginForm = document.getElementById("loginForm");
+const loginMessage = document.getElementById("loginMessage");
+const adminPanel = document.getElementById("adminPanel");
+
+loginForm.addEventListener("submit", (e) => {
   e.preventDefault();
-  const email = document.getElementById("username").value;
-  const password = document.getElementById("password").value;
+  const user = document.getElementById("username").value;
+  const pass = document.getElementById("password").value;
 
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password
-  });
-
-  if (error) {
-    loginMessage.textContent = "❌ " + error.message;
-    loginMessage.style.color = "red";
-    return;
-  }
-
-  loginMessage.textContent = "✅ Login exitoso";
-  loginMessage.style.color = "green";
-
-  setTimeout(() => {
+  if (user === "admin" && pass === "1234") {
+    loginMessage.textContent = "✅ Login exitoso";
+    loginMessage.style.color = "green";
     cerrarLogin();
     adminPanel.style.display = "block";
-  }, 500);
+  } else {
+    loginMessage.textContent = "❌ Usuario o contraseña incorrectos";
+    loginMessage.style.color = "red";
+  }
 });
 
-// Subir archivos
+// --- SUBIDA DE ARCHIVOS A SUPABASE ---
 const uploadForm = document.getElementById("uploadForm");
-const uploadMessage = document.getElementById("uploadMessage");
-
 uploadForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const file = document.getElementById("fileInput").files[0];
-  const nombre = document.getElementById("titulo").value;
-  const semana = "Semana X"; // Puedes cambiarlo dinámicamente si quieres
 
-  if (!file) return alert("Selecciona un archivo");
+  const fileInput = document.getElementById("fileInput");
+  const semana = document.getElementById("semanaSelect").value;
+  const file = fileInput.files[0];
 
-  const filePath = `${Date.now()}-${file.name}`;
+  if (!file) return;
 
-  const { error } = await supabase.storage.from("archivos").upload(filePath, file);
-  if (error) {
-    uploadMessage.textContent = "❌ Error al subir: " + error.message;
-    uploadMessage.style.color = "red";
+  const filePath = `${semana}/${Date.now()}_${file.name}`;
+
+  // Subir a Supabase Storage
+  let { error: uploadError } = await supabase.storage
+    .from("archivos") // 👈 nombre del bucket
+    .upload(filePath, file);
+
+  if (uploadError) {
+    alert("❌ Error al subir archivo");
+    console.error(uploadError);
     return;
   }
 
-  const { data: publicUrlData } = supabase.storage.from("archivos").getPublicUrl(filePath);
+  // Obtener URL pública
+  const { data: publicUrl } = supabase.storage
+    .from("archivos")
+    .getPublicUrl(filePath);
 
-  await supabase.from("archivos").insert([
-    { nombre, semana, url: publicUrlData.publicUrl }
-  ]);
+  // Guardar en tabla
+  let { error: insertError } = await supabase
+    .from("archivos")
+    .insert([{
+      nombre: file.name,
+      semana: semana,
+      fecha: new Date().toISOString(),
+      url: publicUrl.publicUrl
+    }]);
 
-  uploadMessage.textContent = "✅ Archivo subido con éxito";
-  uploadMessage.style.color = "green";
+  if (insertError) {
+    alert("❌ Error al registrar archivo");
+    console.error(insertError);
+    return;
+  }
 
-  mostrarArchivos();
+  fileInput.value = "";
+  alert("✅ Archivo subido a " + semana);
+  await mostrarArchivos(semana);
 });
-
-// Mostrar archivos con semanas
-async function mostrarArchivos() {
-  const { data, error } = await supabase.from("archivos").select("*").order('fecha', { ascending: false });
-  const lista = document.getElementById("trabajosList");
-  lista.innerHTML = "";
-
-  if (error) {
-    lista.innerHTML = "<p>Error al cargar archivos</p>";
-    return;
-  }
-
-  data.forEach(t => {
-    lista.innerHTML += `
-      <div class="trabajo-card">
-        <h3>${t.nombre}</h3>
-        <p><strong>${t.semana}</strong></p>
-        <p>${new Date(t.fecha).toLocaleString()}</p>
-        <a href="${t.url}" target="_blank">📂 Ver archivo</a>
-      </div>
-    `;
-  });
-}
-
-mostrarArchivos();
