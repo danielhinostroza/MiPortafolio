@@ -1,123 +1,81 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Portafolio de Ingeniería de Sistemas</title>
-  <link rel="stylesheet" href="style.css"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portafolio</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- SDK de Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+  <!-- Header -->
   <header>
-     <div class="logo">
-    <img src="imagenes/LogoUpla2-DdpDj6DU.png" alt="Logo UPLA" class="logo-upla">
-    <span>UPLA</span>
-  </div>
-  <nav>
-      <ul>
-        <li><a href="#" id="sobreMiBtn">Sobre mí</a></li>
-        <li><a href="#cursos">Cursos</a></li>
-        <li><a href="#proyectos">Proyectos</a></li>
-        <li><button id="adminBtn" type="button">Administrador</button></li>
-      </ul>
+    <div class="perfil">
+      <img src="tu-foto.jpg" alt="Foto de perfil">
+    </div>
+    <nav>
+      <button onclick="mostrarSeccion('sobreMi')">Sobre mí</button>
+      <button onclick="abrirLogin()">Admin</button>
     </nav>
   </header>
 
+  <!-- Sección Sobre mí -->
+  <section id="sobreMi" class="seccion">
+    <h2>Sobre mí</h2>
+    <p>Aquí puedes poner tu descripción personal.</p>
+  </section>
 
-
-
-  <main>
-    <!-- Sección presentación -->
-    <section id="about" class="about">
-      <img src="imagenes/WhatsApp Image 2025-09-14 at 10.53.54 AM.jpeg" alt="Foto personal" class="profile-pic"/>
-      <h1>Hola, soy Ingeniero de Sistemas</h1>
-      <p>Me especializo en desarrollo de software, diseño de sistemas y soluciones tecnológicas. Aquí comparto mis proyectos y trabajos organizados por curso.</p>
-    </section>
-<!-- Cartilla lateral -->
-<div id="sobreMiCartilla" class="cartilla hidden">
-  <button id="cerrarCartilla" class="cerrar-btn">X</button>
-  <div class="cartilla-content">
-    <img src="imagenes/foto_mia.jpg" alt="Mi foto" class="cartilla-foto"/>
-    <h2>Luis Daniel Hinostroza Canchumanya</h2>
-    <p><strong>Celular:</strong> 956698819</p>
-    <p><strong>Ciudad:</strong> Huancayo, Perú</p>
-    <p><strong>Me gusta:</strong> el desarrollo de software, diseño de sistemas y soluciones tecnológicas.</p>
-  </div>
-</div>
-    <!-- Cursos -->
-    <section id="cursos" class="cursos-section">
-      <h2>Categorías de Cursos</h2>
-      <div class="cursos-grid">
-        <div class="curso-card" data-curso="programacion">💻 Semana 1</div>
-        <div class="curso-card" data-curso="software">🛠️ Semana 2</div>
-        <div class="curso-card" data-curso="investigacion">📑 Semana 3</div>
-        <div class="curso-card" data-curso="grafico">🎨 Semana 4</div>
-        <div class="curso-card" data-curso="redes">🌐 Semana 5</div>
-        <div class="curso-card" data-curso="bases">🗄️ Semana 6</div>
-        <div class="curso-card" data-curso="ia">🤖 Semana 7</div>
-        <div class="curso-card" data-curso="seguridad">🔐 Semana 8</div>
-      </div>
-    </section>
-
-    <!-- Proyectos -->
-    <section id="proyectos" class="proyectos-section">
-      <h2>Trabajos del Curso Seleccionado</h2>
-      <div class="filtros">
-        <label for="filtroTiempo">Filtrar por tiempo:</label>
-        <select id="filtroTiempo">
-          <option value="todos">Todos</option>
-          <option value="hoy">Hoy</option>
-          <option value="semana">Esta semana</option>
-          <option value="mes">Este mes</option>
-        </select>
-      </div>
-      <div id="trabajosList" class="trabajos-list"></div>
-    </section>
-  </main>
-
-  <!-- Modal Login -->
+  <!-- Modal de Login -->
   <div id="loginModal" class="modal">
-    <div class="modal-content">
-      <span class="closeBtn">&times;</span>
-      <h2>Acceso Administrador</h2>
+    <div class="modal-content login-box">
+      <span class="close" onclick="cerrarLogin()">&times;</span>
+      <h2>Login Administrador</h2>
       <form id="loginForm">
-        <label for="login-email">Correo</label>
-        <input type="email" id="login-email" placeholder="admin@portafolio.com" required>
-        <label for="login-password">Contraseña</label>
-        <input type="password" id="login-password" placeholder="********" required>
-        <button type="submit" class="btn-login">Entrar</button>
+        <input type="text" id="username" placeholder="Usuario" required>
+        <input type="password" id="password" placeholder="Contraseña" required>
+        <button type="submit">Entrar</button>
       </form>
-      
+      <p id="loginMessage"></p>
     </div>
   </div>
 
-  <!-- Panel Admin -->
-  <div id="adminPanel" class="admin-panel hidden">
-    <h2>Panel de Administración</h2>
-    <button id="logoutBtn" class="btn-logout">Cerrar Sesión</button>
+  <!-- Panel de administración -->
+  <section id="adminPanel" class="seccion" style="display:none;">
+    <h2>Panel de Administrador</h2>
     <form id="uploadForm">
-      <input type="text" id="titulo" placeholder="Título del trabajo" required>
-      <select id="cursoSelect">
-        <option value="programacion">Semana 1</option>
-        <option value="software">Semana 2</option>
-        <option value="investigacion">Semana 3</option>
-        <option value="grafico">Semana 4</option>
-        <option value="redes">Semana 5</option>
-        <option value="bases">Semana 6</option>
-        <option value="ia">Semana 7</option>
-        <option value="seguridad">Semana 8</option>
+      <select id="semanaSelect">
+        <option value="semana1">Semana 1</option>
+        <option value="semana2">Semana 2</option>
+        <option value="semana3">Semana 3</option>
       </select>
-      <input type="file" id="archivo" required>
-      <button type="submit">Subir Trabajo</button>
+      <input type="file" id="fileInput" required>
+      <button type="submit">Subir archivo</button>
     </form>
+  </section>
+
+  <!-- Vista principal de semanas -->
+  <main id="mainView">
+    <div class="semana" onclick="abrirSemana('semana1')">📂 Semana 1</div>
+    <div class="semana" onclick="abrirSemana('semana2')">📂 Semana 2</div>
+    <div class="semana" onclick="abrirSemana('semana3')">📂 Semana 3</div>
+  </main>
+
+  <!-- Panel de semana individual -->
+  <section id="semanaPanel" class="seccion" style="display:none;">
+    <button onclick="volverMain()">⬅ Volver</button>
+    <h2 id="tituloSemana"></h2>
+    <div id="archivosSemana"></div>
+  </section>
+
+  <!-- Modal para vista previa -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="cerrarModal()">&times;</span>
+      <iframe id="vistaArchivo"></iframe>
+    </div>
   </div>
 
-  <!-- 🚀 Importar Supabase -->
-  <script src="https://unpkg.com/@supabase/supabase-js"></script>
-  <script src="script.js"></script>
-
-
-
-
-
+  <script src="app.js"></script>
 </body>
 </html>
