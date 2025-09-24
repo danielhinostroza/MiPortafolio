@@ -1,13 +1,16 @@
-// 🚀 Conexión con Supabase
-const SUPABASE_URL = "https://unmspywowybnleivempq.supabase.co"; // tu URL real
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVubXNweXdvd3libmxlaXZlbXBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxNTI0NzYsImV4cCI6MjA3MzcyODQ3Nn0.lVDA_rXPqnYbod8CQjZJJUHsuXs8mmJqzzSPIFfI-eU"; // tu anon key
+// Conexión Supabase
+const SUPABASE_URL = "https://unmspywowybnleivempq.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVubXNweXdvd3libmxlaXZlbXBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxNTI0NzYsImV4cCI6MjA3MzcyODQ3Nn0.lVDA_rXPqnYbod8CQjZJJUHsuXs8mmJqzzSPIFfI-eU";
 const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// Botón admin abre modal
+// Botón admin
 document.getElementById("adminBtn").addEventListener("click", abrirLogin);
 
-// --- LOGIN ---
 const loginModal = document.getElementById("loginModal");
+const loginForm = document.getElementById("loginForm");
+const loginMessage = document.getElementById("loginMessage");
+const adminPanel = document.getElementById("adminPanel");
+
 function abrirLogin() {
   loginModal.style.display = "flex";
 }
@@ -15,18 +18,15 @@ function cerrarLogin() {
   loginModal.style.display = "none";
 }
 
-const loginForm = document.getElementById("loginForm");
-const loginMessage = document.getElementById("loginMessage");
-const adminPanel = document.getElementById("adminPanel");
-
+// Login
 loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const email = document.getElementById("username").value;
   const password = document.getElementById("password").value;
 
   const { data, error } = await supabase.auth.signInWithPassword({
-    email: email,
-    password: password
+    email,
+    password
   });
 
   if (error) {
@@ -41,60 +41,63 @@ loginForm.addEventListener("submit", async (e) => {
   setTimeout(() => {
     cerrarLogin();
     adminPanel.style.display = "block";
-  }, 1000);
+  }, 500);
 });
 
-// --- SUBIR ARCHIVOS ---
+// Subir archivos
 const uploadForm = document.getElementById("uploadForm");
 const uploadMessage = document.getElementById("uploadMessage");
 
 uploadForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const file = document.getElementById("fileInput").files[0];
-  const titulo = document.getElementById("titulo").value;
+  const nombre = document.getElementById("titulo").value;
+  const semana = "Semana X"; // Puedes cambiarlo dinámicamente si quieres
 
   if (!file) return alert("Selecciona un archivo");
 
   const filePath = `${Date.now()}-${file.name}`;
 
-  let { error } = await supabase.storage.from("trabajos").upload(filePath, file);
+  const { error } = await supabase.storage.from("archivos").upload(filePath, file);
   if (error) {
     uploadMessage.textContent = "❌ Error al subir: " + error.message;
     uploadMessage.style.color = "red";
     return;
   }
 
-  const { data: publicUrlData } = supabase.storage.from("trabajos").getPublicUrl(filePath);
+  const { data: publicUrlData } = supabase.storage.from("archivos").getPublicUrl(filePath);
 
-  await supabase.from("trabajos").insert([
-    { titulo: titulo, archivo_url: publicUrlData.publicUrl }
+  await supabase.from("archivos").insert([
+    { nombre, semana, url: publicUrlData.publicUrl }
   ]);
 
   uploadMessage.textContent = "✅ Archivo subido con éxito";
   uploadMessage.style.color = "green";
 
-  mostrarTrabajos();
+  mostrarArchivos();
 });
 
-// --- MOSTRAR TRABAJOS ---
-async function mostrarTrabajos() {
-  const { data, error } = await supabase.from("trabajos").select("*");
+// Mostrar archivos con semanas
+async function mostrarArchivos() {
+  const { data, error } = await supabase.from("archivos").select("*").order('fecha', { ascending: false });
   const lista = document.getElementById("trabajosList");
   lista.innerHTML = "";
 
   if (error) {
-    lista.innerHTML = "<p>Error al cargar trabajos</p>";
+    lista.innerHTML = "<p>Error al cargar archivos</p>";
     return;
   }
 
   data.forEach(t => {
     lista.innerHTML += `
       <div class="trabajo-card">
-        <h3>${t.titulo}</h3>
-        <a href="${t.archivo_url}" target="_blank">📂 Ver archivo</a>
+        <h3>${t.nombre}</h3>
+        <p><strong>${t.semana}</strong></p>
+        <p>${new Date(t.fecha).toLocaleString()}</p>
+        <a href="${t.url}" target="_blank">📂 Ver archivo</a>
       </div>
     `;
   });
 }
 
-mostrarTrabajos();
+mostrarArchivos();
