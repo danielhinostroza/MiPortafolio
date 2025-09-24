@@ -1,6 +1,6 @@
 // 🚀 Conexión con Supabase
-const SUPABASE_URL = "https://unmspywowybnleivempq.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVubXNweXdvd3libmxlaXZlbXBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxNTI0NzYsImV4cCI6MjA3MzcyODQ3Nn0.lVDA_rXPqnYbod8CQjZJJUHsuXs8mmJqzzSPIFfI-eU";
+const SUPABASE_URL = "https://unmspywowybnleivempq.supabase.co"; // tu URL real
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVubXNweXdvd3libmxlaXZlbXBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxNTI0NzYsImV4cCI6MjA3MzcyODQ3Nn0.lVDA_rXPqnYbod8CQjZJJUHsuXs8mmJqzzSPIFfI-eU"; // tu anon key
 const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Botón admin abre modal
@@ -66,7 +66,6 @@ uploadForm.addEventListener("submit", async (e) => {
 
   const { data: publicUrlData } = supabase.storage.from("trabajos").getPublicUrl(filePath);
 
-  // Guardar referencia en la BD
   await supabase.from("trabajos").insert([
     { titulo: titulo, archivo_url: publicUrlData.publicUrl }
   ]);
