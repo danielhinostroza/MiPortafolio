@@ -1,70 +1,10 @@
-// --- CONFIGURACIÓN SUPABASE ---
+// 🚀 Conexión con Supabase
 const SUPABASE_URL = "https://unmspywowybnleivempq.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVubXNweXdvd3libmxlaXZlbXBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxNTI0NzYsImV4cCI6MjA3MzcyODQ3Nn0.lVDA_rXPqnYbod8CQjZJJUHsuXs8mmJqzzSPIFfI-eU";
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// --- FUNCIONES DE UI ---
-function mostrarSeccion(id) {
-  document.querySelectorAll('.seccion').forEach(sec => sec.style.display = "none");
-  document.getElementById(id).style.display = "block";
-}
-
-// Abrir panel de una semana
-async function abrirSemana(semana) {
-  document.getElementById("mainView").style.display = "none";
-  document.getElementById("semanaPanel").style.display = "block";
-
-  document.getElementById("tituloSemana").textContent = "📂 " + semana.toUpperCase();
-  await mostrarArchivos(semana);
-  document.getElementById("semanaPanel").setAttribute("data-semana", semana);
-}
-
-// Volver al menú principal
-function volverMain() {
-  document.getElementById("semanaPanel").style.display = "none";
-  document.getElementById("mainView").style.display = "block";
-}
-
-// Mostrar archivos en panel de semana
-async function mostrarArchivos(semana) {
-  const cont = document.getElementById("archivosSemana");
-  cont.innerHTML = "<p>Cargando archivos...</p>";
-
-  let { data, error } = await supabase
-    .from("archivos")
-    .select("*")
-    .eq("semana", semana)
-    .order("fecha", { ascending: false });
-
-  if (error) {
-    cont.innerHTML = `<p style="color:red;">Error cargando archivos</p>`;
-    console.error(error);
-    return;
-  }
-
-  cont.innerHTML = "";
-  data.forEach(fileObj => {
-    const fileDiv = document.createElement("div");
-    fileDiv.classList.add("archivo");
-    fileDiv.innerHTML = `
-      <p><strong>${fileObj.nombre}</strong></p>
-      <p>📅 ${new Date(fileObj.fecha).toLocaleString()}</p>
-      <button onclick="verArchivo('${fileObj.url}')">Ver</button>
-    `;
-    cont.appendChild(fileDiv);
-  });
-}
-
-// Modal para vista previa
-function verArchivo(url) {
-  document.getElementById("modal").style.display = "flex";
-  document.getElementById("vistaArchivo").src = url;
-}
-
-function cerrarModal() {
-  document.getElementById("modal").style.display = "none";
-  document.getElementById("vistaArchivo").src = "";
-}
+// Botón admin abre modal
+document.getElementById("adminBtn").addEventListener("click", abrirLogin);
 
 // --- LOGIN ---
 const loginModal = document.getElementById("loginModal");
@@ -79,68 +19,83 @@ const loginForm = document.getElementById("loginForm");
 const loginMessage = document.getElementById("loginMessage");
 const adminPanel = document.getElementById("adminPanel");
 
-loginForm.addEventListener("submit", (e) => {
+loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const user = document.getElementById("username").value;
-  const pass = document.getElementById("password").value;
+  const email = document.getElementById("username").value;
+  const password = document.getElementById("password").value;
 
-  if (user === "admin" && pass === "1234") {
-    loginMessage.textContent = "✅ Login exitoso";
-    loginMessage.style.color = "green";
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email: email,
+    password: password
+  });
+
+  if (error) {
+    loginMessage.textContent = "❌ " + error.message;
+    loginMessage.style.color = "red";
+    return;
+  }
+
+  loginMessage.textContent = "✅ Login exitoso";
+  loginMessage.style.color = "green";
+
+  setTimeout(() => {
     cerrarLogin();
     adminPanel.style.display = "block";
-  } else {
-    loginMessage.textContent = "❌ Usuario o contraseña incorrectos";
-    loginMessage.style.color = "red";
-  }
+  }, 1000);
 });
 
-// --- SUBIDA DE ARCHIVOS A SUPABASE ---
+// --- SUBIR ARCHIVOS ---
 const uploadForm = document.getElementById("uploadForm");
+const uploadMessage = document.getElementById("uploadMessage");
+
 uploadForm.addEventListener("submit", async (e) => {
   e.preventDefault();
+  const file = document.getElementById("fileInput").files[0];
+  const titulo = document.getElementById("titulo").value;
 
-  const fileInput = document.getElementById("fileInput");
-  const semana = document.getElementById("semanaSelect").value;
-  const file = fileInput.files[0];
+  if (!file) return alert("Selecciona un archivo");
 
-  if (!file) return;
+  const filePath = `${Date.now()}-${file.name}`;
 
-  const filePath = `${semana}/${Date.now()}_${file.name}`;
-
-  // Subir a Supabase Storage
-  let { error: uploadError } = await supabase.storage
-    .from("archivos") // nombre del bucket
-    .upload(filePath, file);
-
-  if (uploadError) {
-    alert("❌ Error al subir archivo");
-    console.error(uploadError);
+  let { error } = await supabase.storage.from("trabajos").upload(filePath, file);
+  if (error) {
+    uploadMessage.textContent = "❌ Error al subir: " + error.message;
+    uploadMessage.style.color = "red";
     return;
   }
 
-  // Obtener URL pública
-  const { data: publicUrl } = supabase.storage
-    .from("archivos")
-    .getPublicUrl(filePath);
+  const { data: publicUrlData } = supabase.storage.from("trabajos").getPublicUrl(filePath);
 
-  // Guardar en tabla
-  let { error: insertError } = await supabase
-    .from("archivos")
-    .insert([{
-      nombre: file.name,
-      semana: semana,
-      fecha: new Date().toISOString(),
-      url: publicUrl.publicUrl
-    }]);
+  // Guardar referencia en la BD
+  await supabase.from("trabajos").insert([
+    { titulo: titulo, archivo_url: publicUrlData.publicUrl }
+  ]);
 
-  if (insertError) {
-    alert("❌ Error al registrar archivo");
-    console.error(insertError);
-    return;
-  }
+  uploadMessage.textContent = "✅ Archivo subido con éxito";
+  uploadMessage.style.color = "green";
 
-  fileInput.value = "";
-  alert("✅ Archivo subido a " + semana);
-  await mostrarArchivos(semana);
+  mostrarTrabajos();
 });
+
+// --- MOSTRAR TRABAJOS ---
+async function mostrarTrabajos() {
+  const { data, error } = await supabase.from("trabajos").select("*");
+  const lista = document.getElementById("trabajosList");
+  lista.innerHTML = "";
+
+  if (error) {
+    lista.innerHTML = "<p>Error al cargar trabajos</p>";
+    return;
+  }
+
+  data.forEach(t => {
+    lista.innerHTML += `
+      <div class="trabajo-card">
+        <h3>${t.titulo}</h3>
+        <a href="${t.archivo_url}" target="_blank">📂 Ver archivo</a>
+      </div>
+    `;
+  });
+}
+
+mostrarTrabajos();
