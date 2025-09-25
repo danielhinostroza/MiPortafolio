@@ -45,9 +45,15 @@ async function uploadFile() {
     return;
   }
 
-  // 🚨 Nombre único dentro de la carpeta de la semana
+  if (!titulo) {
+    alert("Escribe un título para el trabajo");
+    return;
+  }
+
+  // 🚨 Nombre único: curso + timestamp + nombre
   const fileName = `${curso}/${Date.now()}_${file.name}`;
 
+  // Subida al bucket "archivos"
   const { data, error } = await supabaseClient.storage
     .from("archivos")
     .upload(fileName, file);
@@ -58,7 +64,9 @@ async function uploadFile() {
   } else {
     alert("Archivo subido con éxito 🎉");
     console.log("Archivo:", data);
-    listFiles(curso); // refresca la lista automáticamente
+
+    // 🚀 Refrescar la lista en la web automáticamente
+    await listFiles();
   }
 }
 
@@ -155,3 +163,5 @@ if (uploadForm) {
     await uploadFile();
   });
 }
+
+
