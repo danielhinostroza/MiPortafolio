@@ -293,3 +293,48 @@ header {
 #file-list a:hover {
   text-decoration: underline;
 }
+
+
+#pdf-viewer-container {
+  display: flex;
+  justify-content: center; /* centra horizontalmente */
+  margin: 20px 0;          /* un poco de espacio arriba y abajo */
+}
+
+#pdf-viewer {
+  width: 80%;              /* ancho del 80% del contenedor padre */
+  max-width: 900px;        /* no se haga más grande que 900px */
+  height: 500px;           /* altura fija */
+  border: 1px solid #ccc;  /* borde sutil */
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1); /* sombra ligera */
+  border-radius: 8px;      /* esquinas redondeadas */
+}
+
+
+
+#pdf-container {
+  display: none; /* Oculto por defecto */
+  width: 80%;
+  max-width: 900px;
+  height: 600px;
+  margin: 20px auto; /* Centrado */
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  border-radius: 10px;
+  background-color: #f9f9f9; /* Color suave solo para la vista previa */
+  position: relative;
+}
+
+#pdf-controls {
+  text-align: right;
+  padding: 10px;
+  background-color: #eee;
+  border-bottom: 1px solid #ccc;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+#pdf-viewer {
+  width: 100%;
+  height: calc(100% - 50px); /* Ajustar altura para controles */
+  overflow: auto;
+}

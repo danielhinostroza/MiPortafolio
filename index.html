@@ -12,7 +12,7 @@
     <img src="imagenes/LogoUpla2-DdpDj6DU.png" alt="Logo UPLA" class="logo-upla">
     <span>UPLA</span>
   </div>
-  <nav>
+  <nav>                   
       <ul>
         <li><a href="#" id="sobreMiBtn">Sobre mí</a></li>
         <li><a href="#cursos">Cursos</a></li>
@@ -22,9 +22,6 @@
     </nav>
   </header>
 
-
-
-
   <main>
     <!-- Sección presentación -->
     <section id="about" class="about">
@@ -32,17 +29,19 @@
       <h1>Hola, soy Ingeniero de Sistemas</h1>
       <p>Me especializo en desarrollo de software, diseño de sistemas y soluciones tecnológicas. Aquí comparto mis proyectos y trabajos organizados por curso.</p>
     </section>
-<!-- Cartilla lateral -->
-<div id="sobreMiCartilla" class="cartilla hidden">
-  <button id="cerrarCartilla" class="cerrar-btn">X</button>
-  <div class="cartilla-content">
-    <img src="imagenes/foto_mia.jpg" alt="Mi foto" class="cartilla-foto"/>
-    <h2>Luis Daniel Hinostroza Canchumanya</h2>
-    <p><strong>Celular:</strong> 956698819</p>
-    <p><strong>Ciudad:</strong> Huancayo, Perú</p>
-    <p><strong>Me gusta:</strong> el desarrollo de software, diseño de sistemas y soluciones tecnológicas.</p>
-  </div>
-</div>
+
+    <!-- Cartilla lateral -->
+    <div id="sobreMiCartilla" class="cartilla hidden">
+      <button id="cerrarCartilla" class="cerrar-btn">X</button>
+      <div class="cartilla-content">
+        <img src="imagenes/foto_mia.jpg" alt="Mi foto" class="cartilla-foto"/>
+        <h2>Luis Daniel Hinostroza Canchumanya</h2>
+        <p><strong>Celular:</strong> 956698819</p>
+        <p><strong>Ciudad:</strong> Huancayo, Perú</p>
+        <p><strong>Me gusta:</strong> el desarrollo de software, diseño de sistemas y soluciones tecnológicas.</p>
+      </div>
+    </div>
+
     <!-- Cursos -->
     <section id="cursos" class="cursos-section">
       <h2>Categorías de Cursos</h2>
@@ -72,10 +71,16 @@
       </div>
       <div id="trabajosList" class="trabajos-list"></div>
 
-      
+      <!-- 🆕 Aquí listaremos los archivos -->
+      <ul id="file-list"></ul>
 
-       <!-- 🆕 Aquí listaremos los archivos -->
-  <ul id="file-list"></ul>
+<!-- Contenedor para previsualizar PDF -->
+<div id="pdf-container" style="display:none;">
+  <div id="pdf-controls">
+    <button id="closePdfBtn">Cerrar Vista Previa</button>
+  </div>
+  <div id="pdf-viewer"></div>
+</div>
 
 
 
@@ -94,7 +99,6 @@
         <input type="password" id="login-password" placeholder="********" required>
         <button type="submit" class="btn-login">Entrar</button>
       </form>
-      
     </div>
   </div>
 
@@ -123,10 +127,5 @@
   <script src="https://unpkg.com/@supabase/supabase-js"></script>
   <script src="script.js"></script>
 
-
-
-
-
 </body>
 </html>
-

@@ -71,7 +71,6 @@ async function uploadFile() {
 }
 
 // ==================== LISTAR ARCHIVOS ====================
-// Listar archivos de la semana seleccionada
 async function listFiles(curso) {
   const { data, error } = await supabaseClient.storage
     .from("archivos")
@@ -91,6 +90,11 @@ async function listFiles(curso) {
     return;
   }
 
+  const pdfContainer = document.getElementById("pdf-container");
+  const pdfViewer = document.getElementById("pdf-viewer");
+  pdfViewer.innerHTML = ""; 
+  pdfContainer.style.display = "none"; // Oculto si no hay PDF abierto
+
   for (let file of data) {
     // ✅ Obtener URL pública
     const { data: urlData } = supabaseClient.storage
@@ -99,15 +103,21 @@ async function listFiles(curso) {
 
     const li = document.createElement("li");
 
-    // ✅ Mostrar botón "Eliminar" solo si el admin está logueado
     li.innerHTML = `
       <span>📄 ${file.name}</span>
       <div>
-        <a href="${urlData.publicUrl}" target="_blank">Ver PDF</a>
+        <a href="#" class="viewPdfBtn">Ver PDF</a>
         <a href="${urlData.publicUrl}" download>Descargar</a>
         ${adminPanel.style.display === "block" ? `<button class="deleteBtn">Eliminar</button>` : ""}
       </div>
     `;
+
+    // Evento para mostrar PDF en el contenedor
+    li.querySelector(".viewPdfBtn").addEventListener("click", (e) => {
+      e.preventDefault();
+      pdfViewer.innerHTML = `<iframe src="${urlData.publicUrl}" width="100%" height="100%" style="border:none;"></iframe>`;
+      pdfContainer.style.display = "block";
+    });
 
     // Evento para eliminar archivo
     if (adminPanel.style.display === "block") {
@@ -167,15 +177,12 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
     alert("Error al iniciar sesión: " + error.message);
   } else {
     alert("Login correcto ✅");
-
-    // 🚀 Mostrar panel de admin y ocultar modal
     loginModal.style.display = "none";
     adminPanel.style.display = "block";
   }
 });
 
 // ==================== FORMULARIO DE SUBIDA ====================
-// 🚀 IMPORTANTE: prevenir que el submit recargue la página
 const uploadForm = document.getElementById("uploadForm");
 if (uploadForm) {
   uploadForm.addEventListener("submit", async (e) => {
@@ -190,7 +197,6 @@ async function deleteFile(filePath) {
   if (!confirmDelete) return;
 
   try {
-    // Borrar del bucket usando la ruta exacta
     const { error: storageError } = await supabaseClient.storage
       .from("archivos")
       .remove([filePath]);
@@ -201,7 +207,6 @@ async function deleteFile(filePath) {
       return;
     }
 
-    // Borrar del registro en la tabla 'trabajos'
     const { error: dbError } = await supabaseClient
       .from("trabajos")
       .delete()
@@ -214,9 +219,7 @@ async function deleteFile(filePath) {
     }
 
     alert("Archivo eliminado con éxito ✅");
-
-    // Refrescar lista de archivos
-    const semana = filePath.split("/")[0]; // extraer la carpeta
+    const semana = filePath.split("/")[0];
     await listFiles(semana);
 
   } catch (err) {
@@ -224,3 +227,13 @@ async function deleteFile(filePath) {
     alert("Ocurrió un error al eliminar el archivo");
   }
 }
+
+// ==================== VISTA PREVIA PDF ====================
+const pdfContainer = document.getElementById("pdf-container");
+const pdfViewer = document.getElementById("pdf-viewer");
+const closePdfBtn = document.getElementById("closePdfBtn");
+
+closePdfBtn.addEventListener("click", () => {
+  pdfViewer.innerHTML = "";
+  pdfContainer.style.display = "none";
+});
