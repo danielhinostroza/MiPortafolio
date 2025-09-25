@@ -338,3 +338,92 @@ header {
   height: calc(100% - 50px); /* Ajustar altura para controles */
   overflow: auto;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+/* ==================== ARCHIVOS SUBIDOS ==================== */
+#file-list {
+  display: flex;
+  flex-wrap: wrap;        /* Permite varias filas */
+  gap: 16px;              /* Espacio entre tarjetas */
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+#file-list li {
+  background-color: rgba(30, 30, 47, 0.9); /* Tarjeta semi-transparente */
+  color: #fff;
+  padding: 16px;
+  border-radius: 12px;
+  width: 220px;               /* Ancho fijo de la tarjeta */
+  display: flex;
+  flex-direction: column;     /* Nombre arriba, botones abajo */
+  justify-content: space-between;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+#file-list li:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 12px rgba(0,0,0,0.5);
+}
+
+#file-list li span {
+  margin-bottom: 8px;
+  font-weight: bold;
+  word-break: break-word;     /* Para nombres largos */
+}
+
+#file-list li small {
+  display: block;
+  font-size: 0.8em;
+  color: #ccc;
+  margin-bottom: 12px;
+}
+
+#file-list li div {
+  display: flex;
+  justify-content: space-between; /* Botones separados */
+  gap: 8px;
+}
+
+#file-list a, #file-list button {
+  text-decoration: none;
+  color: #ffb500;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  padding: 6px 10px;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+#file-list a:hover, #file-list button:hover {
+  color: #fff;
+  background-color: rgba(255,255,255,0.1);
+}
+
+
+
+#file-list li img {
+  width: 100%;
+  height: 140px;         /* Ajusta según tamaño de tarjeta */
+  object-fit: cover;     /* Mantiene proporción, recorta si es necesario */
+  border-radius: 8px;
+  margin-bottom: 12px;
+  background: #222;      /* Fondo oscuro si PDF tarda en cargar */
+}
+
+
+

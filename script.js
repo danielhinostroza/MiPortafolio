@@ -33,11 +33,10 @@ async function logout() {
 }
 
 // ==================== SUBIDA DE ARCHIVOS ====================
-// Subir archivo al bucket
 async function uploadFile() {
   const fileInput = document.getElementById("archivo");
   const file = fileInput.files[0];
-  const curso = document.getElementById("cursoSelect").value; // 🔥 semana/carpeta
+  const curso = document.getElementById("cursoSelect").value; 
   const titulo = document.getElementById("titulo").value;
 
   if (!file) {
@@ -50,10 +49,8 @@ async function uploadFile() {
     return;
   }
 
-  // 🚨 Nombre único: curso + timestamp + nombre
   const filePath = `${curso}/${Date.now()}_${file.name}`;
 
-  // Subida al bucket "archivos"
   const { data, error } = await supabaseClient.storage
     .from("archivos")
     .upload(filePath, file);
@@ -64,8 +61,6 @@ async function uploadFile() {
   } else {
     alert("Archivo subido con éxito 🎉");
     console.log("Archivo:", data);
-
-    // 🚀 Refrescar la lista en la web automáticamente
     await listFiles(curso);
   }
 }
@@ -90,36 +85,56 @@ async function listFiles(curso) {
     return;
   }
 
-  const pdfContainer = document.getElementById("pdf-container");
-  const pdfViewer = document.getElementById("pdf-viewer");
   pdfViewer.innerHTML = ""; 
-  pdfContainer.style.display = "none"; // Oculto si no hay PDF abierto
+  pdfContainer.style.display = "none";
 
   for (let file of data) {
-    // ✅ Obtener URL pública
     const { data: urlData } = supabaseClient.storage
       .from("archivos")
       .getPublicUrl(`${curso}/${file.name}`);
 
+    // Obtener fecha desde el timestamp en el nombre
+    const timestampPart = file.name.split("_")[0];
+    const date = new Date(Number(timestampPart));
+    const fechaFormateada = date.toLocaleString();
+
     const li = document.createElement("li");
 
     li.innerHTML = `
-      <span>📄 ${file.name}</span>
+      <span>📄 ${file.name.split("_").slice(1).join("_")} - <small>${fechaFormateada}</small></span>
       <div>
         <a href="#" class="viewPdfBtn">Ver PDF</a>
-        <a href="${urlData.publicUrl}" download>Descargar</a>
+        <a href="#" class="downloadPdfBtn">Descargar</a>
         ${adminPanel.style.display === "block" ? `<button class="deleteBtn">Eliminar</button>` : ""}
       </div>
     `;
 
-    // Evento para mostrar PDF en el contenedor
+    // Mostrar PDF en visor
     li.querySelector(".viewPdfBtn").addEventListener("click", (e) => {
       e.preventDefault();
       pdfViewer.innerHTML = `<iframe src="${urlData.publicUrl}" width="100%" height="100%" style="border:none;"></iframe>`;
       pdfContainer.style.display = "block";
     });
 
-    // Evento para eliminar archivo
+    // Descargar archivo correctamente usando fetch + Blob
+    li.querySelector(".downloadPdfBtn").addEventListener("click", async (e) => {
+      e.preventDefault();
+      try {
+        const res = await fetch(urlData.publicUrl);
+        const blob = await res.blob();
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = file.name.split("_").slice(1).join("_"); // descargar con nombre limpio
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch (err) {
+        console.error("Error al descargar archivo:", err);
+        alert("No se pudo descargar el archivo.");
+      }
+    });
+
+    // Eliminar archivo
     if (adminPanel.style.display === "block") {
       li.querySelector(".deleteBtn").addEventListener("click", () => {
         deleteFile(`${curso}/${file.name}`);
@@ -145,24 +160,20 @@ const loginModal = document.getElementById("loginModal");
 const closeBtn = document.querySelector(".closeBtn");
 const adminPanel = document.getElementById("adminPanel");
 
-// Abrir modal al hacer click en "Administrador"
 adminBtn.addEventListener("click", () => {
   loginModal.style.display = "block";
 });
 
-// Cerrar modal con la X
 closeBtn.addEventListener("click", () => {
   loginModal.style.display = "none";
 });
 
-// Cerrar modal si el usuario hace click fuera del contenido
 window.addEventListener("click", (event) => {
   if (event.target === loginModal) {
     loginModal.style.display = "none";
   }
 });
 
-// Manejar formulario de login
 document.getElementById("loginForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const email = document.getElementById("login-email").value;
@@ -191,7 +202,7 @@ if (uploadForm) {
   });
 }
 
-// ==================== ELIMINAR ARCHIVOS CORRECTO ====================
+// ==================== ELIMINAR ARCHIVOS ====================
 async function deleteFile(filePath) {
   const confirmDelete = confirm(`¿Seguro quieres eliminar "${filePath}"?`);
   if (!confirmDelete) return;
@@ -237,3 +248,6 @@ closePdfBtn.addEventListener("click", () => {
   pdfViewer.innerHTML = "";
   pdfContainer.style.display = "none";
 });
+
+
+
