@@ -79,3 +79,31 @@ async function listFiles() {
     });
   }
 }
+
+// ==================== MODAL ADMIN ====================
+const adminBtn = document.getElementById("adminBtn");
+const loginModal = document.getElementById("loginModal");
+const closeBtn = document.querySelector(".closeBtn");
+
+// Abrir modal al hacer click en "Administrador"
+adminBtn.addEventListener("click", () => {
+  loginModal.style.display = "block";
+});
+
+// Cerrar modal con la X
+closeBtn.addEventListener("click", () => {
+  loginModal.style.display = "none";
+});
+
+// Cerrar modal si el usuario hace click fuera del contenido
+window.addEventListener("click", (event) => {
+  if (event.target === loginModal) {
+    loginModal.style.display = "none";
+  }
+});
+
+// Manejar formulario de login
+document.getElementById("loginForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  await login();
+});
