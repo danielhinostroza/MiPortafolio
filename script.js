@@ -35,18 +35,19 @@ async function logout() {
 // ==================== SUBIDA DE ARCHIVOS ====================
 // Subir archivo al bucket
 async function uploadFile() {
-  const fileInput = document.getElementById("archivo"); // 🔥 corregido: antes estaba "file-input"
+  const fileInput = document.getElementById("archivo");
   const file = fileInput.files[0];
+  const curso = document.getElementById("cursoSelect").value; // 🔥 semana/carpeta
+  const titulo = document.getElementById("titulo").value;
 
   if (!file) {
     alert("Selecciona un archivo primero");
     return;
   }
 
-  // 🚨 Nombre único para evitar sobreescrituras
-  const fileName = `${Date.now()}_${file.name}`;
+  // 🚨 Nombre único dentro de la carpeta de la semana
+  const fileName = `${curso}/${Date.now()}_${file.name}`;
 
-  // Subida al bucket "archivos"
   const { data, error } = await supabaseClient.storage
     .from("archivos")
     .upload(fileName, file);
@@ -57,30 +58,48 @@ async function uploadFile() {
   } else {
     alert("Archivo subido con éxito 🎉");
     console.log("Archivo:", data);
+    listFiles(curso); // refresca la lista automáticamente
   }
 }
 
 // ==================== LISTAR ARCHIVOS ====================
-async function listFiles() {
+// Listar archivos de la semana seleccionada
+async function listFiles(curso) {
   const { data, error } = await supabaseClient.storage
     .from("archivos")
-    .list("", { limit: 50 });
+    .list(curso, { limit: 50 });
+
+  const fileList = document.getElementById("file-list");
+  fileList.innerHTML = "";
 
   if (error) {
     alert("Error al listar archivos: " + error.message);
-  } else {
-    const fileList = document.getElementById("file-list");
-    if (fileList) {
-      fileList.innerHTML = "";
+    return;
+  }
 
-      data.forEach((file) => {
-        const li = document.createElement("li");
-        li.textContent = file.name;
-        fileList.appendChild(li);
-      });
-    }
+  if (data.length === 0) {
+    fileList.innerHTML = "<li>No hay archivos en esta semana</li>";
+    return;
+  }
+
+  for (let file of data) {
+    // 🔥 Obtener URL pública del archivo
+    const { data: urlData } = supabaseClient.storage
+      .from("archivos")
+      .getPublicUrl(`${curso}/${file.name}`);
+
+    const li = document.createElement("li");
+    li.innerHTML = `
+      <span>📄 ${file.name}</span>
+      <div>
+        <a href="${urlData.publicUrl}" target="_blank">Ver</a>
+        <a href="${urlData.publicUrl}" download>Descargar</a>
+      </div>
+    `;
+    fileList.appendChild(li);
   }
 }
+
 
 // ==================== MODAL ADMIN ====================
 const adminBtn = document.getElementById("adminBtn");
