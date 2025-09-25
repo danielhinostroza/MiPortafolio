@@ -184,36 +184,29 @@ if (uploadForm) {
   });
 }
 
-// ==================== ELIMINAR ARCHIVOS ====================
+// ==================== ELIMINAR ARCHIVOS OPTIMIZADO ====================
 async function deleteFile(semana, fileName) {
   const confirmDelete = confirm(`¿Seguro quieres eliminar "${fileName}"?`);
   if (!confirmDelete) return;
 
   try {
+    // Construir la ruta correcta del archivo en Storage
+    const filePath = `${semana}/${fileName}`;
+
     // Borrar del bucket
-    const { error: storageError } = await supabaseClient.storage
+    const { data, error } = await supabaseClient.storage
       .from("archivos")
-      .remove([`${semana}/${fileName}`]);
+      .remove([filePath]);
 
-    if (storageError) {
-      alert("Error al eliminar el archivo del storage: " + storageError.message);
+    if (error) {
+      alert("Error al eliminar el archivo del storage: " + error.message);
+      console.error(error);
       return;
     }
 
-    // Borrar del registro en la tabla 'trabajos'
-    const { error: dbError } = await supabaseClient
-      .from("trabajos")
-      .delete()
-      .eq("archivo_url", `${semana}/${fileName}`);
+    alert("Archivo eliminado del storage con éxito ✅");
 
-    if (dbError) {
-      alert("Error al eliminar el registro en la base de datos: " + dbError.message);
-      return;
-    }
-
-    alert("Archivo eliminado con éxito ✅");
-
-    // Refrescar la lista
+    // Refrescar la lista de archivos de la semana
     await listFiles(semana);
 
   } catch (err) {
@@ -221,4 +214,3 @@ async function deleteFile(semana, fileName) {
     alert("Ocurrió un error al eliminar el archivo");
   }
 }
-
