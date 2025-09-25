@@ -84,6 +84,7 @@ async function listFiles() {
 const adminBtn = document.getElementById("adminBtn");
 const loginModal = document.getElementById("loginModal");
 const closeBtn = document.querySelector(".closeBtn");
+const adminPanel = document.getElementById("adminPanel");
 
 // Abrir modal al hacer click en "Administrador"
 adminBtn.addEventListener("click", () => {
@@ -105,5 +106,21 @@ window.addEventListener("click", (event) => {
 // Manejar formulario de login
 document.getElementById("loginForm").addEventListener("submit", async (e) => {
   e.preventDefault();
-  await login();
+  const email = document.getElementById("login-email").value;
+  const password = document.getElementById("login-password").value;
+
+  const { data, error } = await supabaseClient.auth.signInWithPassword({
+    email,
+    password,
+  });
+
+  if (error) {
+    alert("Error al iniciar sesión: " + error.message);
+  } else {
+    alert("Login correcto ✅");
+
+    // 🚀 Mostrar panel de admin y ocultar modal
+    loginModal.style.display = "none";
+    adminPanel.style.display = "block";
+  }
 });
