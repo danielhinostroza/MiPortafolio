@@ -125,4 +125,12 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
   }
 });
 
-
+// ==================== FORMULARIO DE SUBIDA ====================
+// 🚀 IMPORTANTE: prevenir que el submit recargue la página
+const uploadForm = document.getElementById("uploadForm");
+if (uploadForm) {
+  uploadForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    await uploadFile();
+  });
+}
