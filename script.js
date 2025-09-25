@@ -51,12 +51,12 @@ async function uploadFile() {
   }
 
   // 🚨 Nombre único: curso + timestamp + nombre
-  const fileName = `${curso}/${Date.now()}_${file.name}`;
+  const filePath = `${curso}/${Date.now()}_${file.name}`;
 
   // Subida al bucket "archivos"
   const { data, error } = await supabaseClient.storage
     .from("archivos")
-    .upload(fileName, file);
+    .upload(filePath, file);
 
   if (error) {
     alert("Error al subir archivo: " + error.message);
@@ -112,7 +112,7 @@ async function listFiles(curso) {
     // Evento para eliminar archivo
     if (adminPanel.style.display === "block") {
       li.querySelector(".deleteBtn").addEventListener("click", () => {
-        deleteFile(curso, file.name);
+        deleteFile(`${curso}/${file.name}`);
       });
     }
 
@@ -184,29 +184,39 @@ if (uploadForm) {
   });
 }
 
-// ==================== ELIMINAR ARCHIVOS OPTIMIZADO ====================
-async function deleteFile(semana, fileName) {
-  const confirmDelete = confirm(`¿Seguro quieres eliminar "${fileName}"?`);
+// ==================== ELIMINAR ARCHIVOS CORRECTO ====================
+async function deleteFile(filePath) {
+  const confirmDelete = confirm(`¿Seguro quieres eliminar "${filePath}"?`);
   if (!confirmDelete) return;
 
   try {
-    // Construir la ruta correcta del archivo en Storage
-    const filePath = `${semana}/${fileName}`;
-
-    // Borrar del bucket
-    const { data, error } = await supabaseClient.storage
+    // Borrar del bucket usando la ruta exacta
+    const { error: storageError } = await supabaseClient.storage
       .from("archivos")
       .remove([filePath]);
 
-    if (error) {
-      alert("Error al eliminar el archivo del storage: " + error.message);
-      console.error(error);
+    if (storageError) {
+      alert("Error al eliminar el archivo del storage: " + storageError.message);
+      console.error(storageError);
       return;
     }
 
-    alert("Archivo eliminado del storage con éxito ✅");
+    // Borrar del registro en la tabla 'trabajos'
+    const { error: dbError } = await supabaseClient
+      .from("trabajos")
+      .delete()
+      .eq("archivo_url", filePath);
 
-    // Refrescar la lista de archivos de la semana
+    if (dbError) {
+      alert("Error al eliminar el registro en la base de datos: " + dbError.message);
+      console.error(dbError);
+      return;
+    }
+
+    alert("Archivo eliminado con éxito ✅");
+
+    // Refrescar lista de archivos
+    const semana = filePath.split("/")[0]; // extraer la carpeta
     await listFiles(semana);
 
   } catch (err) {
