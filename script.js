@@ -81,17 +81,18 @@ async function listFiles(curso) {
   fileList.innerHTML = "";
 
   if (error) {
-    alert("Error al listar archivos: " + error.message);
+    fileList.innerHTML = "<li>Error al listar archivos</li>";
+    console.error(error);
     return;
   }
 
-  if (data.length === 0) {
+  if (!data || data.length === 0) {
     fileList.innerHTML = "<li>No hay archivos en esta semana</li>";
     return;
   }
 
   for (let file of data) {
-    // 🔥 Obtener URL pública del archivo
+    // ✅ Obtener URL pública
     const { data: urlData } = supabaseClient.storage
       .from("archivos")
       .getPublicUrl(`${curso}/${file.name}`);
@@ -100,13 +101,22 @@ async function listFiles(curso) {
     li.innerHTML = `
       <span>📄 ${file.name}</span>
       <div>
-        <a href="${urlData.publicUrl}" target="_blank">Ver</a>
+        <a href="${urlData.publicUrl}" target="_blank">Ver PDF</a>
         <a href="${urlData.publicUrl}" download>Descargar</a>
       </div>
     `;
     fileList.appendChild(li);
   }
 }
+
+// ==================== CLIC EN TARJETAS DE SEMANA ====================
+const cursoCards = document.querySelectorAll(".curso-card");
+cursoCards.forEach(card => {
+  card.addEventListener("click", async () => {
+    const curso = card.dataset.curso;
+    await listFiles(curso);
+  });
+});
 
 
 // ==================== MODAL ADMIN ====================
