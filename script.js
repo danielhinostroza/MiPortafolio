@@ -35,7 +35,7 @@ async function logout() {
 // ==================== SUBIDA DE ARCHIVOS ====================
 // Subir archivo al bucket
 async function uploadFile() {
-  const fileInput = document.getElementById("file-input");
+  const fileInput = document.getElementById("archivo"); // 🔥 corregido: antes estaba "file-input"
   const file = fileInput.files[0];
 
   if (!file) {
@@ -70,13 +70,15 @@ async function listFiles() {
     alert("Error al listar archivos: " + error.message);
   } else {
     const fileList = document.getElementById("file-list");
-    fileList.innerHTML = "";
+    if (fileList) {
+      fileList.innerHTML = "";
 
-    data.forEach((file) => {
-      const li = document.createElement("li");
-      li.textContent = file.name;
-      fileList.appendChild(li);
-    });
+      data.forEach((file) => {
+        const li = document.createElement("li");
+        li.textContent = file.name;
+        fileList.appendChild(li);
+      });
+    }
   }
 }
 

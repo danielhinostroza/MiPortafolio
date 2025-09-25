@@ -1,139 +1,124 @@
-<script>
-// 🚀 Configuración de Supabase
-const SUPABASE_URL = "https://unmspywowybnleivempq.supabase.co"; 
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVubXNweXdvd3libmxlaXZlbXBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxNTI0NzYsImV4cCI6MjA3MzcyODQ3Nn0.lVDA_rXPqnYbod8CQjZJJUHsuXs8mmJqzzSPIFfI-eU";
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Portafolio de Ingeniería de Sistemas</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <header>
+     <div class="logo">
+    <img src="imagenes/LogoUpla2-DdpDj6DU.png" alt="Logo UPLA" class="logo-upla">
+    <span>UPLA</span>
+  </div>
+  <nav>
+      <ul>
+        <li><a href="#" id="sobreMiBtn">Sobre mí</a></li>
+        <li><a href="#cursos">Cursos</a></li>
+        <li><a href="#proyectos">Proyectos</a></li>
+        <li><button id="adminBtn" type="button">Administrador</button></li>
+      </ul>
+    </nav>
+  </header>
 
-// ==================== AUTENTICACIÓN ====================
-// Login
-async function login() {
-  const email = document.getElementById("login-email").value;
-  const password = document.getElementById("login-password").value;
 
-  const { data, error } = await supabaseClient.auth.signInWithPassword({
-    email,
-    password,
-  });
 
-  if (error) {
-    alert("Error al iniciar sesión: " + error.message);
-  } else {
-    alert("Login correcto");
-    console.log("Usuario:", data.user);
-  }
-}
 
-// Logout
-async function logout() {
-  const { error } = await supabaseClient.auth.signOut();
-  if (error) {
-    alert("Error al cerrar sesión: " + error.message);
-  } else {
-    alert("Sesión cerrada");
-  }
-}
+  <main>
+    <!-- Sección presentación -->
+    <section id="about" class="about">
+      <img src="imagenes/WhatsApp Image 2025-09-14 at 10.53.54 AM.jpeg" alt="Foto personal" class="profile-pic"/>
+      <h1>Hola, soy Ingeniero de Sistemas</h1>
+      <p>Me especializo en desarrollo de software, diseño de sistemas y soluciones tecnológicas. Aquí comparto mis proyectos y trabajos organizados por curso.</p>
+    </section>
+<!-- Cartilla lateral -->
+<div id="sobreMiCartilla" class="cartilla hidden">
+  <button id="cerrarCartilla" class="cerrar-btn">X</button>
+  <div class="cartilla-content">
+    <img src="imagenes/foto_mia.jpg" alt="Mi foto" class="cartilla-foto"/>
+    <h2>Luis Daniel Hinostroza Canchumanya</h2>
+    <p><strong>Celular:</strong> 956698819</p>
+    <p><strong>Ciudad:</strong> Huancayo, Perú</p>
+    <p><strong>Me gusta:</strong> el desarrollo de software, diseño de sistemas y soluciones tecnológicas.</p>
+  </div>
+</div>
+    <!-- Cursos -->
+    <section id="cursos" class="cursos-section">
+      <h2>Categorías de Cursos</h2>
+      <div class="cursos-grid">
+        <div class="curso-card" data-curso="programacion">💻 Semana 1</div>
+        <div class="curso-card" data-curso="software">🛠️ Semana 2</div>
+        <div class="curso-card" data-curso="investigacion">📑 Semana 3</div>
+        <div class="curso-card" data-curso="grafico">🎨 Semana 4</div>
+        <div class="curso-card" data-curso="redes">🌐 Semana 5</div>
+        <div class="curso-card" data-curso="bases">🗄️ Semana 6</div>
+        <div class="curso-card" data-curso="ia">🤖 Semana 7</div>
+        <div class="curso-card" data-curso="seguridad">🔐 Semana 8</div>
+      </div>
+    </section>
 
-// ==================== SUBIDA DE ARCHIVOS ====================
-// Subir archivo al bucket
-async function uploadFile() {
-  const fileInput = document.getElementById("file-input");
-  const file = fileInput.files[0];
+    <!-- Proyectos -->
+    <section id="proyectos" class="proyectos-section">
+      <h2>Trabajos del Curso Seleccionado</h2>
+      <div class="filtros">
+        <label for="filtroTiempo">Filtrar por tiempo:</label>
+        <select id="filtroTiempo">
+          <option value="todos">Todos</option>
+          <option value="hoy">Hoy</option>
+          <option value="semana">Esta semana</option>
+          <option value="mes">Este mes</option>
+        </select>
+      </div>
+      <div id="trabajosList" class="trabajos-list"></div>
+    </section>
+  </main>
 
-  if (!file) {
-    alert("Selecciona un archivo primero");
-    return;
-  }
+  <!-- Modal Login -->
+  <div id="loginModal" class="modal">
+    <div class="modal-content">
+      <span class="closeBtn">&times;</span>
+      <h2>Acceso Administrador</h2>
+      <form id="loginForm">
+        <label for="login-email">Correo</label>
+        <input type="email" id="login-email" placeholder="admin@portafolio.com" required>
+        <label for="login-password">Contraseña</label>
+        <input type="password" id="login-password" placeholder="********" required>
+        <button type="submit" class="btn-login">Entrar</button>
+      </form>
+      
+    </div>
+  </div>
 
-  // 🚨 Nombre único para evitar sobreescrituras
-  const fileName = `${Date.now()}_${file.name}`;
+  <!-- Panel Admin -->
+  <div id="adminPanel" class="admin-panel hidden">
+    <h2>Panel de Administración</h2>
+    <button id="logoutBtn" class="btn-logout">Cerrar Sesión</button>
+    <form id="uploadForm">
+      <input type="text" id="titulo" placeholder="Título del trabajo" required>
+      <select id="cursoSelect">
+        <option value="programacion">Semana 1</option>
+        <option value="software">Semana 2</option>
+        <option value="investigacion">Semana 3</option>
+        <option value="grafico">Semana 4</option>
+        <option value="redes">Semana 5</option>
+        <option value="bases">Semana 6</option>
+        <option value="ia">Semana 7</option>
+        <option value="seguridad">Semana 8</option>
+      </select>
+      <input type="file" id="archivo" required>
+      <button type="submit">Subir Trabajo</button>
+    </form>
+  </div>
 
-  // Subida al bucket "archivos"
-  const { data, error } = await supabaseClient.storage
-    .from("archivos")
-    .upload(fileName, file);
+  <!-- 🚀 Importar Supabase -->
+  <script src="https://unpkg.com/@supabase/supabase-js"></script>
+  <script src="script.js"></script>
 
-  if (error) {
-    alert("Error al subir archivo: " + error.message);
-    console.error(error);
-  } else {
-    alert("Archivo subido con éxito 🎉");
-    console.log("Archivo:", data);
 
-    // 🚀 Recargar lista de archivos después de subir
-    listFiles();
-  }
-}
 
-// ==================== LISTAR ARCHIVOS ====================
-async function listFiles() {
-  const { data, error } = await supabaseClient.storage
-    .from("archivos")
-    .list("", { limit: 50 });
 
-  if (error) {
-    alert("Error al listar archivos: " + error.message);
-  } else {
-    const fileList = document.getElementById("file-list");
-    fileList.innerHTML = "";
 
-    data.forEach((file) => {
-      const li = document.createElement("li");
-      li.textContent = file.name;
-      fileList.appendChild(li);
-    });
-  }
-}
+</body>
+</html>
 
-// ==================== MODAL ADMIN ====================
-const adminBtn = document.getElementById("adminBtn");
-const loginModal = document.getElementById("loginModal");
-const closeBtn = document.querySelector(".closeBtn");
-const adminPanel = document.getElementById("adminPanel");
-
-// Abrir modal al hacer click en "Administrador"
-adminBtn.addEventListener("click", () => {
-  loginModal.style.display = "block";
-});
-
-// Cerrar modal con la X
-closeBtn.addEventListener("click", () => {
-  loginModal.style.display = "none";
-});
-
-// Cerrar modal si el usuario hace click fuera del contenido
-window.addEventListener("click", (event) => {
-  if (event.target === loginModal) {
-    loginModal.style.display = "none";
-  }
-});
-
-// Manejar formulario de login
-document.getElementById("loginForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const email = document.getElementById("login-email").value;
-  const password = document.getElementById("login-password").value;
-
-  const { data, error } = await supabaseClient.auth.signInWithPassword({
-    email,
-    password,
-  });
-
-  if (error) {
-    alert("Error al iniciar sesión: " + error.message);
-  } else {
-    alert("Login correcto ✅");
-
-    // 🚀 Mostrar panel de admin y ocultar modal
-    loginModal.style.display = "none";
-    adminPanel.style.display = "block";
-  }
-});
-
-// ==================== CONECTAR BOTÓN SUBIR ====================
-// 👇 Aquí conectamos el botón "Subir Trabajo"
-document.getElementById("uploadBtn").addEventListener("click", uploadFile);
-
-// 🚀 Cargar lista de archivos apenas se abre la página
-listFiles();
-
-</script>
