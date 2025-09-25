@@ -66,7 +66,7 @@ async function uploadFile() {
     console.log("Archivo:", data);
 
     // 🚀 Refrescar la lista en la web automáticamente
-    await listFiles();
+    await listFiles(curso);
   }
 }
 
@@ -98,13 +98,24 @@ async function listFiles(curso) {
       .getPublicUrl(`${curso}/${file.name}`);
 
     const li = document.createElement("li");
+
+    // ✅ Mostrar botón "Eliminar" solo si el admin está logueado
     li.innerHTML = `
       <span>📄 ${file.name}</span>
       <div>
         <a href="${urlData.publicUrl}" target="_blank">Ver PDF</a>
         <a href="${urlData.publicUrl}" download>Descargar</a>
+        ${adminPanel.style.display === "block" ? `<button class="deleteBtn">Eliminar</button>` : ""}
       </div>
     `;
+
+    // Evento para eliminar archivo
+    if (adminPanel.style.display === "block") {
+      li.querySelector(".deleteBtn").addEventListener("click", () => {
+        deleteFile(curso, file.name);
+      });
+    }
+
     fileList.appendChild(li);
   }
 }
@@ -117,7 +128,6 @@ cursoCards.forEach(card => {
     await listFiles(curso);
   });
 });
-
 
 // ==================== MODAL ADMIN ====================
 const adminBtn = document.getElementById("adminBtn");
@@ -174,4 +184,40 @@ if (uploadForm) {
   });
 }
 
+// ==================== ELIMINAR ARCHIVOS ====================
+async function deleteFile(semana, fileName) {
+  const confirmDelete = confirm(`¿Seguro quieres eliminar "${fileName}"?`);
+  if (!confirmDelete) return;
 
+  try {
+    // Borrar del bucket
+    const { error: storageError } = await supabaseClient.storage
+      .from("archivos")
+      .remove([`${semana}/${fileName}`]);
+
+    if (storageError) {
+      alert("Error al eliminar el archivo del storage: " + storageError.message);
+      return;
+    }
+
+    // Borrar del registro en la tabla 'trabajos'
+    const { error: dbError } = await supabaseClient
+      .from("trabajos")
+      .delete()
+      .eq("archivo_url", `${semana}/${fileName}`);
+
+    if (dbError) {
+      alert("Error al eliminar el registro en la base de datos: " + dbError.message);
+      return;
+    }
+
+    alert("Archivo eliminado con éxito ✅");
+
+    // Refrescar la lista
+    await listFiles(semana);
+
+  } catch (err) {
+    console.error(err);
+    alert("Ocurrió un error al eliminar el archivo");
+  }
+}
