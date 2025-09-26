@@ -251,3 +251,25 @@ closePdfBtn.addEventListener("click", () => {
 
 
 
+// ==================== SOBRE MÍ ====================
+const sobreMiBtn = document.getElementById("sobreMiBtn");
+const sobreMiCartilla = document.getElementById("sobreMiCartilla");
+const cerrarCartilla = document.getElementById("cerrarCartilla");
+
+// Abrir cartilla
+sobreMiBtn.addEventListener("click", (e) => {
+  e.preventDefault();
+  sobreMiCartilla.classList.add("show");
+});
+
+// Cerrar cartilla
+cerrarCartilla.addEventListener("click", () => {
+  sobreMiCartilla.classList.remove("show");
+});
+
+// Cerrar con clic fuera (opcional)
+window.addEventListener("click", (e) => {
+  if (e.target === sobreMiCartilla) {
+    sobreMiCartilla.classList.remove("show");
+  }
+});

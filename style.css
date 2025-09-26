@@ -427,3 +427,216 @@ header {
 
 
 
+
+
+
+
+/* ==================== CARTILLA "SOBRE MÍ" ==================== */
+.cartilla {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 340px;
+  height: 100vh;
+  background: url("imagenes/gg.webp") no-repeat center center / cover; /* 📸 Imagen de fondo */
+  color: #fff;
+  box-shadow: -4px 0 20px rgba(0,0,0,0.6);
+  padding: 25px;
+  transform: translateX(100%); /* Oculta hacia la derecha */
+  transition: transform 0.4s ease-in-out;
+  z-index: 9999;
+}
+
+.cartilla::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.55); /* 🔥 Filtro oscuro para que el texto resalte */
+  z-index: 0;
+}
+
+.cartilla-content {
+  position: relative;
+  z-index: 1; /* Se asegura de estar encima del overlay */
+  margin-top: 60px;
+  text-align: center;
+}
+
+/* 🖼️ Contenedor de la foto con borde dinámico */
+.cartilla-foto {
+  position: relative;
+  width: 135px;   /* 📌 un poquito más grande */
+  height: 135px;
+  margin: 0 auto 15px auto;
+  border-radius: 50%;
+  overflow: hidden; /* Asegura que la foto quede recortada en círculo */
+  z-index: 1;
+}
+
+/* Foto dentro del contenedor */
+.cartilla-foto img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: block;
+  border: 3px solid #fff;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+  position: relative;
+  z-index: 2;
+}
+
+/* ⚡✨ Efecto épico de borde dinámico */
+.cartilla-foto::before {
+  content: "";
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  width: calc(100% + 12px);
+  height: calc(100% + 12px);
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    #6a11cb,
+    #2575fc,
+    #6a11cb,
+    #ff00ff,
+    #6a11cb
+  );
+  animation: spin 6s linear infinite;
+  filter: blur(3px);
+  z-index: 1;
+}
+
+/* ✨ Halo brillante */
+.cartilla-foto::after {
+  content: "";
+  position: absolute;
+  top: -12px;
+  left: -12px;
+  width: calc(100% + 24px);
+  height: calc(100% + 24px);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,0,255,0.4), transparent 70%);
+  animation: pulse 2.5s infinite ease-in-out;
+  z-index: 0;
+}
+
+/* Animaciones */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.2); opacity: 1; }
+}
+
+.cerrar-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: rgba(255, 255, 255, 0.25);
+  border: none;
+  color: #fff;
+  font-weight: bold;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: all 0.3s ease;
+  z-index: 2;
+}
+
+.cerrar-btn:hover {
+  transform: rotate(90deg) scale(1.1);
+  background: rgba(255, 255, 255, 0.4);
+}
+
+/* ==================== ARCHIVOS SUBIDOS (Diseño bonito) ==================== */
+#file-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+  padding: 0;
+  list-style: none;
+}
+
+#file-list li {
+  width: 100px;
+  height: 100px;
+  background: #1a1a1a;
+  border: 2px solid #444;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 12px;
+  color: #fff;
+  padding: 8px;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+#file-list li:hover {
+  transform: translateY(-6px) scale(1.05);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.6);
+}
+
+#file-list li i {
+  font-size: 28px;
+  color: #4da3ff;
+  margin-bottom: 6px;
+}
+
+#file-list li span {
+  display: block;
+  font-size: 11px;
+  color: #ddd;
+  word-break: break-word;
+  max-width: 90px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ==================== LOGO AL FINAL ==================== */
+.cartilla-logo {
+  margin-top: 80px;       /* 📌 Más abajo que antes */
+  text-align: center;
+}
+
+.cartilla-logo img {
+  width: 200px;           /* 📌 Un poquito más grande que la foto de perfil */
+  height: 200px;
+  border-radius: 0;       /* 📌 Sin bordes redondeados */
+  border: none;           /* 📌 Sin borde */
+  box-shadow: none;       /* 📌 Sin sombra */
+  display: block;
+  margin: 0 auto;
+  object-fit: contain;    /* 📌 Mantiene proporción de tu logo */
+}
+
+
+
+.cartilla-logo img {
+  width: 150px;
+  height: 150px;
+  display: block;
+  margin: 0 auto;
+  object-fit: contain;
+
+  animation: glowLogo 4s ease-in-out infinite;
+}
+
+@keyframes glowLogo {
+  0%, 100% { filter: drop-shadow(0 0 5px #6a11cb) drop-shadow(0 0 10px #2575fc); }
+  50% { filter: drop-shadow(0 0 20px #ff00ff) drop-shadow(0 0 40px #6a11cb); }
+}
