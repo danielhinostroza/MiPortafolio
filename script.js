@@ -244,11 +244,15 @@ const pdfContainer = document.getElementById("pdf-container");
 const pdfViewer = document.getElementById("pdf-viewer");
 const closePdfBtn = document.getElementById("closePdfBtn");
 
+function verPDF(url) {
+  pdfViewer.innerHTML = `<iframe src="${url}" width="100%" height="100%"></iframe>`;
+  pdfContainer.style.display = "block";  // lo muestra
+}
+
 closePdfBtn.addEventListener("click", () => {
   pdfViewer.innerHTML = "";
-  pdfContainer.style.display = "none";
+  pdfContainer.style.display = "none";   // lo oculta
 });
-
 
 
 // ==================== SOBRE MÍ ====================

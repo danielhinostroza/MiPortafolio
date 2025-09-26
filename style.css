@@ -265,83 +265,109 @@ header {
   cursor: pointer;
 }
 
-/* ==================== ARCHIVOS SUBIDOS ==================== */
+/* ==================== ARCHIVOS SUBIDOS (Diseño bonito) ==================== */
 #file-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
   margin-top: 20px;
   padding: 0;
   list-style: none;
 }
+
 #file-list li {
-  margin-bottom: 10px;
-  padding: 12px;
-  background: rgba(255,255,255,0.15);
-  border-radius: 8px;
+  width: 280px;              /* 📌 Más ancho */
+  min-height: 160px;         /* 📌 Alto igual que antes */
+  background: #1a1a1a;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
-}
-#file-list span {
-  font-weight: bold;
+  justify-content: space-between;
+  text-align: center;
+  font-size: 13px;
   color: #fff;
-}
-#file-list a {
-  margin-left: 10px;
-  text-decoration: none;
-  color: #ffb400;
-  font-weight: bold;
-}
-#file-list a:hover {
-  text-decoration: underline;
-}
-
-
-#pdf-viewer-container {
-  display: flex;
-  justify-content: center; /* centra horizontalmente */
-  margin: 20px 0;          /* un poco de espacio arriba y abajo */
-}
-
-#pdf-viewer {
-  width: 80%;              /* ancho del 80% del contenedor padre */
-  max-width: 900px;        /* no se haga más grande que 900px */
-  height: 500px;           /* altura fija */
-  border: 1px solid #ccc;  /* borde sutil */
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1); /* sombra ligera */
-  border-radius: 8px;      /* esquinas redondeadas */
-}
-
-
-
-#pdf-container {
-  display: none; /* Oculto por defecto */
-  width: 80%;
-  max-width: 900px;
-  height: 600px;
-  margin: 20px auto; /* Centrado */
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-  border-radius: 10px;
-  background-color: #f9f9f9; /* Color suave solo para la vista previa */
+  padding: 12px;
+  transition: transform 0.3s, box-shadow 0.3s, border 0.3s;
   position: relative;
 }
 
-#pdf-controls {
-  text-align: right;
-  padding: 10px;
-  background-color: #eee;
-  border-bottom: 1px solid #ccc;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
+/* ✨ Borde morado brillante dinámico */
+#file-list li::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border-radius: 12px;
+  background: linear-gradient(45deg, #6a11cb, #ff00ff, #2575fc, #6a11cb);
+  background-size: 300% 300%;
+  animation: borderGlow 6s linear infinite;
+  z-index: -1;
 }
 
-#pdf-viewer {
-  width: 100%;
-  height: calc(100% - 50px); /* Ajustar altura para controles */
-  overflow: auto;
+@keyframes borderGlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
+#file-list li:hover {
+  transform: translateY(-6px) scale(1.05);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.6);
+}
 
+#file-list li i {
+  font-size: 28px;
+  color: #4da3ff;
+  margin-bottom: 6px;
+}
 
+#file-list li span {
+  display: block;
+  font-size: 12px;
+  color: #ddd;
+  word-break: break-word;
+  max-width: 90%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-bottom: 6px;
+}
 
+#file-list li small {
+  display: block;
+  font-size: 0.8em;
+  color: #aaa;
+  margin-bottom: 10px;
+}
+
+#file-list li div {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: auto;
+}
+
+#file-list a, #file-list button {
+  text-decoration: none;
+  color: #ffb500;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  padding: 6px 10px;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+#file-list a:hover, #file-list button:hover {
+  color: #fff;
+  background-color: rgba(255,255,255,0.1);
+}
 
 
 
@@ -429,8 +455,6 @@ header {
 
 
 
-
-
 /* ==================== CARTILLA "SOBRE MÍ" ==================== */
 .cartilla {
   position: fixed;
@@ -486,6 +510,17 @@ header {
   box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
   position: relative;
   z-index: 2;
+
+  /* ❤️ Animación de pulso tipo corazón */
+  animation: pulseHeart 1.8s infinite;
+}
+
+@keyframes pulseHeart {
+  0%   { transform: scale(1); }
+  25%  { transform: scale(1.1); }
+  40%  { transform: scale(0.95); }
+  60%  { transform: scale(1.15); }
+  100% { transform: scale(1); }
 }
 
 /* ⚡✨ Efecto épico de borde dinámico */
@@ -622,16 +657,6 @@ header {
   display: block;
   margin: 0 auto;
   object-fit: contain;    /* 📌 Mantiene proporción de tu logo */
-}
-
-
-
-.cartilla-logo img {
-  width: 150px;
-  height: 150px;
-  display: block;
-  margin: 0 auto;
-  object-fit: contain;
 
   animation: glowLogo 4s ease-in-out infinite;
 }
@@ -639,4 +664,96 @@ header {
 @keyframes glowLogo {
   0%, 100% { filter: drop-shadow(0 0 5px #6a11cb) drop-shadow(0 0 10px #2575fc); }
   50% { filter: drop-shadow(0 0 20px #ff00ff) drop-shadow(0 0 40px #6a11cb); }
+}
+
+
+
+
+
+
+
+
+
+/* 🖼️ Contenedor de la foto con borde dinámico */
+.cartilla-foto {
+  position: relative;
+  width: 135px;   /* 📌 un poquito más grande */
+  height: 135px;
+  margin: 0 auto 15px auto;
+  border-radius: 50%;
+  overflow: hidden; /* Asegura que la foto quede recortada en círculo */
+  z-index: 1;
+
+  /* ❤️ Pulso tipo corazón */
+  animation: pulseHeart 1.8s infinite;
+}
+
+.cartilla-foto img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: block;
+  border: 3px solid #fff;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+  position: relative;
+  z-index: 2;
+}
+
+/* ❤️ Animación de pulso tipo corazón */
+@keyframes pulseHeart {
+  0%   { transform: scale(1); }
+  25%  { transform: scale(1.1); }
+  40%  { transform: scale(0.95); }
+  60%  { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+
+/* ==================== VISTA PDF ABAJO ==================== */
+#pdf-container {
+  display: none;              /* Oculto por defecto */
+  width: 100%;
+  margin-top: 40px;           /* Espacio con lo de arriba */
+  display: flex;
+  justify-content: center;    /* Centrar horizontal */
+}
+
+#pdf-viewer {
+  width: 60%;                 /* Más delgado (antes 80%) */
+  max-width: 900px;           /* Máximo para pantallas grandes */
+  min-width: 400px;           /* Para que no se haga muy chico */
+  height: 500px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #111;
+  box-shadow: 0 0 15px rgba(0,0,0,0.5);
+  margin: 0 auto;             /* 👈 Esto lo centra bien */
+}
+
+#pdf-viewer iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+#pdf-controls {
+  text-align: right;
+  margin: 0 auto 8px auto;   /* 👈 Botón también centrado */
+  width: 60%;                /* Igual ancho que el viewer */
+  max-width: 900px;
+  min-width: 400px;
+}
+
+#closePdfBtn {
+  background: #e74c3c;
+  border: none;
+  color: #fff;
+  font-weight: bold;
+  border-radius: 8px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+#closePdfBtn:hover {
+  background: #c0392b;
 }
