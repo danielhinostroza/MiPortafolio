@@ -15,7 +15,7 @@
   <nav>                   
       <ul>
         <li><a href="#" id="sobreMiBtn">Sobre mí</a></li>
-        <li><a href="#cursos">Cursos</a></li>
+        <li><a href="#cursos">Semanas</a></li>
         <li><a href="#proyectos">Proyectos</a></li>
         <li><button id="adminBtn" type="button">Administrador</button></li>
       </ul>
@@ -25,9 +25,9 @@
   <main>
     <!-- Sección presentación -->
     <section id="about" class="about">
-      <img src="imagenes/WhatsApp Image 2025-09-14 at 10.53.54 AM.jpeg" alt="Foto personal" class="profile-pic"/>
-      <h1>Hola, soy Estudiante de Ingenieria de Sistemas</h1>
-      <p>Me especializo en desarrollo de software, diseño de sistemas y soluciones tecnológicas. Aquí comparto mis proyectos y trabajos organizados por curso.</p>
+      <img src="imagenes/LogoUpla2-DdpDj6DU.png" alt="Foto personal" class="profile-pic"/>
+      <h1>UNIVERSIDAD PERUANA LOS ANDES</h1>
+      <p>Faculta de Ingenieria de Sistemas</p>
     </section>
 
     <!-- Cartilla lateral "Sobre mí" -->
@@ -49,7 +49,7 @@
 
     <!-- Cursos -->
     <section id="cursos" class="cursos-section">
-      <h2>Categorías de Cursos</h2>
+      <h2>Trabajos por Semanas</h2>
       <div class="cursos-grid">
         <div class="curso-card" data-curso="semana 1">💻 Semana 1</div>
         <div class="curso-card" data-curso="semana 2">🛠️ Semana 2</div>
@@ -127,6 +127,17 @@
       <button type="submit">Subir Trabajo</button>
     </form>
   </div>
+ 
+  <button id="btn-add-user">➕ Agregar Usuario</button>
+
+<div id="add-user-modal" style="display:none; background:#222; padding:20px; border-radius:10px; margin-top:10px;">
+  <h3>Nuevo Usuario</h3>
+  <input type="email" id="new-user-email" placeholder="Correo del usuario">
+  <input type="password" id="new-user-password" placeholder="Contraseña">
+  <button id="create-user">Crear</button>
+  <button id="cancel-user">Cancelar</button>
+</div>
+
 
   <!-- 🚀 Importar Supabase -->
   <script src="https://unpkg.com/@supabase/supabase-js"></script>
@@ -135,5 +146,11 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.12.313/pdf.min.js"></script>
 <script src="script.js"></script>
+
+
+
+
+
+
 </body>
 </html>

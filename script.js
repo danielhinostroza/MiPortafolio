@@ -277,3 +277,45 @@ window.addEventListener("click", (e) => {
     sobreMiCartilla.classList.remove("show");
   }
 });
+
+
+
+// Mostrar / ocultar modal
+document.getElementById("btn-add-user").addEventListener("click", () => {
+  document.getElementById("add-user-modal").style.display = "block";
+});
+
+document.getElementById("cancel-user").addEventListener("click", () => {
+  document.getElementById("add-user-modal").style.display = "none";
+});
+
+// Crear usuario en Supabase (modo admin con Service Role Key ⚠️)
+document.getElementById("create-user").addEventListener("click", async () => {
+  const email = document.getElementById("new-user-email").value;
+  const password = document.getElementById("new-user-password").value;
+
+  if (!email || !password) {
+    alert("Completa todos los campos");
+    return;
+  }
+
+  // IMPORTANTE: para crear usuarios necesitas usar la SERVICE ROLE KEY
+  // NO el anon key
+  const supabaseAdmin = window.supabase.createClient(
+    "https://unmspywowybnleivempq.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVubXNweXdvd3libmxlaXZlbXBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxNTI0NzYsImV4cCI6MjA3MzcyODQ3Nn0.lVDA_rXPqnYbod8CQjZJJUHsuXs8mmJqzzSPIFfI-eU" // ⚠️ esta key no va en frontend, sino en backend seguro
+  );
+
+  const { data, error } = await supabaseAdmin.auth.admin.createUser({
+    email,
+    password,
+    email_confirm: true
+  });
+
+  if (error) {
+    alert("Error: " + error.message);
+  } else {
+    alert("Usuario creado con éxito");
+    document.getElementById("add-user-modal").style.display = "none";
+  }
+});
